@@ -101,10 +101,25 @@ This database contains X records, of which Y with pressure. ...
 % We believe, this features, can improve both the quality of the curations and their effectiveness. In annotation tasks (e.g. NER) it was demonstrated that visual pre-annotations were improving the task over several aspects, including time consumption and error rate~\cite{Fort2010InfluenceOP, Nvol2011SemiautomaticSA, Lingren2014EvaluatingTI}.
 
 
+\section{Grobid-superconductors}
 
-\section{System}
+% Overview from the other paper, what are the differences and some repetition on the previous paper 
+Grobid-superconductor is the extraction system that allow the process of text or PDF documents to extract materials and corresponding properties. 
+We retained some of the ideas previously discussed in a preliminary study~\cite{foppiano:hal-02870896}.  
+We design grobid-superconductors as a multi-steps tool based on the Grobid library~\cite{GROBID} which bring three main advantages. 
+a) It integrates with a specific tool \textit{pdfalto}\footnote{\url{https://github.com/kermitt2/pdfalto}} for PDF parsing. \textit{pdfalto} solves or tries to mitigate extraction issues such as the resolution of embedded fonts, invalid character encoding, and the reconstruction of the correct reading order. 
+b) It allows to access to low level layout PDF information and, c) provides access to a set of pre-trained machine learning models for structuring documents.
 
-We designed the system to follow the initial proposal \cite{foppiano:hal-02870896} which lay its foundations on the Grobid library for parsing and structuring scientific documents.
+% Abstract vs fulltext
+The scope of grobid-superconductors is to process the whole full-text of a paper with the exception of figures and tables which require separate work on their own. 
+In general, most of the related work are dealing with the abstract text. This choice is  justified by the fact that abstract are easier to obtain~\cite{kononova_text-mined_2019} and contain more condensed information~\cite{yamaguchi-etal-2020-sc, court_magnetic_2020}. However, we stress on the fact that the access to full-text gives access to additional information 
+
+
+
+
+The architecture supports additional entities types, several machine learning architectures and we developed one additional model to parse the material names. 
+
+: material, class, measuremement method, Tc value, Tc expressions and pressure~\cite{foppiano2020supermat}  which lay its foundations on the Grobid library for parsing and structuring scientific documents.
 Reasons why we use the grobid library: 
  - exploit layout information
  - manage already pdf encoding crap 
@@ -119,7 +134,7 @@ The following section provide a deeper description of the architecture.
 The architecture of this system is divided into three steps: Preprocess (a) which transforms the input pdf document or text into a set of object preserving structure and layout information. Extraction (b) is an Named Entities Recognition component , and c) Linking.
 
 
-\subsubsection{Preprocess}
+\subsubsection{Document structuring}
 The Preprocess transforms the input Pdf document into structured text where structure items like title, abstract, body, and annex are extracted separately. In addition, we retain also layout information such as font type, font size, superscript, subscript, bold, italic. 
 This component utilise an open source tool called Grobid~\cite{GROBID} which is a specialised machine learning library for restructuring scientific in PDF format. 
 
