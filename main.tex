@@ -38,20 +38,21 @@ However, discovering a new superconductor is still a challenging task~\cite{Phys
 Most of the superconductors materials have been discovered using the "feeling" (or "serendipity") approach following researchers intuition rather than any particular methodology.~\cite{doi:10.1080/08957959.2019.1695253}
 
 % 2. Use of data-driven approaches is becoming more popular and fundamental for material discovery (there are many reviews - example citations data from Pedro) 
-In the recent years, the data-driven approaches become more popular~\cite{stanev_machine_2017, le2020critical,Hamlin2019SuperconductivityNR}.
+% ~\cite{stanev_machine_2017, le2020critical,Hamlin2019SuperconductivityNR}.(Superdocutivity releated citations)
 
-[PC to add a smoother introduction here]
+% Pedro
+In the recent years, with the creation of computational databases, such as the MaterialsProject (MP)\cite{materialsprojectJain2013} and the Open Quantum Materials Database (OQMD)\cite{oqmdkirklin2015open}, and experimental data repositories such as NIMS MDR, the focus has been steadily shifting towards a data-driven design of materials. In this new paradigm, the efficient use of data to guide experiments and materials property prediction through use of machine learning methods, for example, takes the center stage. 
+For example, data-driven methods have been used to search/design magnetocaloric materials\cite{Bocarsly2017,Castro2020,court2021inverse}, photocatalysts for hydrogen splitting\cite{xiong2021optimizing}, thermoeletrics\cite{iwasaki2019machine}. Furthermore, the advance of natural language processing methods for data extraction of scientific literature, also plays a key role in supporting this new paradigm. For example, Court et. al \cite{court2018auto} developed a semi-automatic system to build a dataset of magnetic materials with their Neel and Curie temperatures. 
 
-% Related work: Description of other work for creation of structured data for superconductors materials
-There are few related works that are relevant. \cite{court2018auto} developed a semi-automatic system to build a dataset of materials with their Neel and Curie temperatures. Other work from the same authors attempted to build a model for predicting properties, e.g. magnetic and superconducting critical temperature~\cite{court_magnetic_2020}. Although the initial attempt was targeting the magnetic temperature, the published dataset provided also the superconductors critical temperature, due to the the overuse, by researchers, of the term "T\textsubscript{c}" for many different properties. 
-Another important contribution is \cite{yamaguchi-etal-2020-sc} where the authors focus on superconductors critical temperature. 
-One of the main problem with predicting T\textsuperscript{c} is to make reliable models which consider also non-superconducting materials or failed experiment to provide the model with the largest amount of information. Unfortunately, this is not often the case because failures and negative results are usually not reported in scientific papers.
-% I will handle this (PC) up ffrom there to line 41.
-SuperCon (\url{http://supercon.nims.go.jp}) is one of the most remarkable works in this domain: a structured database of superconductors materials and their properties, developed at the National Institute for Materials Science (NIMS) in Japan. 
+Other work from the same authors attempted to build a model for predicting properties, e.g. magnetic and superconducting critical temperature~\cite{court_magnetic_2020}. In the specific case of superconductivity, most of data-driven works relies on a single database: SuperCon\cite{stanev_machine_2017, le2020critical,Hamlin2019SuperconductivityNR}.
+
+In more details, SuperCon (\url{http://supercon.nims.go.jp}) is a structured database of superconductors materials and their properties, developed at the National Institute for Materials Science (NIMS) in Japan. 
 At the time of writing this paper, SuperCon contains  X inorganic and Y organic materials and is the "de-facto" standard in data-driven research for superconductors materials: about 4400 articles contains the mention "\textit{supercon database}" in Google scholar. 
+% One of the main problem with predicting T\textsuperscript{c} is to make reliable models which consider also non-superconducting materials or failed experiment to provide the model with the largest amount of information. Unfortunately, this is not often the case because failures and negative results are usually not reported in scientific papers.
+% % I will handle this (PC) up ffrom there to line 41.
 
-According to~\cite{chen2020acritical}, however, predicting superconducting critical temperature T\textsubscript{c} remains a major challenge due to lack of universal theory for superconductivity and their physical models. 
-Furthermore, the absence of  structural information is "\textit{a critical gap that needs to be addressed for the development of reliable ML models}".
+% According to~\cite{chen2020acritical}, however, predicting superconducting critical temperature T\textsubscript{c} remains a major challenge due to lack of universal theory for superconductivity and their physical models. 
+% Furthermore, the absence of  structural information is "\textit{a critical gap that needs to be addressed for the development of reliable ML models}".
 
 % Negative results are not reported - so it's very hard to create a reliable model 
 
@@ -74,7 +75,7 @@ In summary, there is a strong need for a tool to produce a structured database o
 Ideally, our goal is to have a single tool that can be customised with ease to work in several domains. Nevertheless, at this stage, we focus only on superconductors materials research. 
 
 % 6. in this work we present X, where we did Y and obtain Z
-In this work, we present our system for automatically build a structured database of superconductors materials and properties, from scientific literature. The tool is called grobid-superconductors and is a module based on grobid~\cite{GROBID}, a machine learning library to parse and structure scientific documents. 
+In this work, we present our system for automatically build a structured database of superconductors materials and properties, from scientific literature. The tool is called grobid-superconductors and is a module based on grobid~\cite{GROBID}, a machine learning library to parse and structure scientific documents, a tool that support PDFs natively, a diverse set of ML architetures (CRF, Recurrent Neural Networks (RNN) based on LSTM, and transformers where the contextual embedding can be selected between BERT and SciBERT), allowing it to work with the fulltext of scientific papers, not only the abstract.
 We developed grobid-superconductors and we trained using our previous work: SuperMat~\cite{foppiano2020supermat}, an corpus of annotated linked data of superconductors research articles.
 
 
