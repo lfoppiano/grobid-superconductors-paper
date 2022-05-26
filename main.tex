@@ -5,6 +5,7 @@
 \graphicspath{{images/}}
 \usepackage{authblk}
 \usepackage{csquotes}
+\usepackage{array}
 
 \providecommand{\keywords}[1]
 {
@@ -53,10 +54,11 @@ Most of the superconductors materials have been discovered using the "feeling" (
 % ~\cite{stanev_machine_2017, le2020critical,Hamlin2019SuperconductivityNR}.(Superdocutivity releated citations)
 
 % Pedro
-In the recent years, with the creation of computational databases, such as the Materials Project (MP)~\cite{materialsprojectJain2013}, the Open Quantum Materials Database (OQMD)~\cite{oqmdkirklin2015open}, and then experimental data repositories such as NIMS MDR (\url{http://mdr.nims.go.jp})~\cite{ranganathan_anusha_2019_3553963}, the focus has been steadily shifting towards a data-driven design of materials. In this new paradigm, the efficient use of data to guide experiments and materials property prediction through use of machine learning methods, for example, takes the centre stage. 
-For example, data-driven methods have been used to search/design magnetocaloric materials~\cite{Bocarsly2017,Castro2020,court2021inverse}, photocatalysts for hydrogen splitting~\cite{xiong2021optimizing}, thermoeletrics~\cite{iwasaki2019machine}. Furthermore, the advance of natural language processing methods for data extraction of scientific literature, also plays a key role in supporting this new paradigm. For example, \cite{court2018auto} developed a semi-automatic system to build a dataset of magnetic materials with their Néel and Curie temperatures.  
+In the recent years, with the creation of computational databases, such as the Materials Project (MP)~\cite{materialsprojectJain2013}, the Open Quantum Materials Database (OQMD)~\cite{oqmdkirklin2015open}, and then experimental data repositories such as NIMS MDR (\url{http://mdr.nims.go.jp})~\cite{ranganathan_anusha_2019_3553963}, the focus has been steadily shifting towards a data-driven design of materials. In this new paradigm, the efficient use of data to guide experiments and materials property prediction through use of machine learning methods takes the centre stage. 
+For example, data-driven methods have been used to search/design magneto-caloric materials~\cite{Bocarsly2017,Castro2020,court2021inverse}, photo-catalysts for hydrogen splitting~\cite{xiong2021optimizing}, thermoeletrics~\cite{iwasaki2019machine}. 
+Furthermore, the advance of natural language processing methods for data extraction of scientific literature, also plays a key role in supporting this new paradigm. 
+For example, \cite{court2018auto} developed a semi-automatic system to build a dataset of magnetic materials with their Néel and Curie temperatures.  
 Other work from the same authors attempted to build a model for predicting properties, e.g. magnetic and superconducting critical temperature~\cite{court_magnetic_2020}. In the specific case of superconductivity, most of data-driven works relies on a single database: SuperCon\cite{stanev_machine_2017, le2020critical,Hamlin2019SuperconductivityNR}.
-
 
 In more details, SuperCon (\url{http://supercon.nims.go.jp}) is a structured database of superconductors materials and their properties, developed at the National Institute for Materials Science (NIMS) in Japan. 
 At the time of writing this paper, SuperCon contains about 33000 inorganic and 600 organic materials and is the "de-facto" standard in data-driven research for superconductors materials: about 4400 articles contains the mention "\textit{supercon database}" in Google scholar. 
@@ -73,49 +75,46 @@ At the time of writing this paper, SuperCon contains about 33000 inorganic and 6
 % I want to say that the fact that supercon was built manually provided access to data in each part of the paper without limitation. While an automatic system would require different approeaches for plot/figures, tables and text. 
 SuperCon is manually curated with an average update rate of 6-10 articles (corresponding to 25-30 records) every 3 months\footnote{Obtained from \url{https://dice.nims.go.jp} news feed of "2021.12.08" and "2021.09.06".}. 
 The slow process makes difficult to incorporate the information from new publications in a timely manner.
-In addition, such process does not guarantee 100 percent correctness: invalid formulas, typing mistakes are known by people that have worked with the data. Unfortunately the lack of feedback system did not help to improve the quality collectively. 
-For example [PC can give me some examples]
+%In addition, such process does not guarantee 100 percent correctness: invalid formulas, typing mistakes are known by people that have worked with the data. Unfortunately the lack of feedback system did not help to improve the quality collectively. 
+%For example [PC can give me some examples]
 
 From architecture prospective SuperCon employ the same design from more than 20 years ago. The schema has not changed since then and was designed to be flexible with a key-value approach where additional properties could be introduced and collected by curators.
 % Since the research focus can shift back and forth on different aspects and properties of materials (e.g. results under applied pressure, measurement of critical current, study of specific phenomena) the underlying schema could accommodate such changes. 
 Today, SuperCon contains as much as 175 properties but it lacks important information like the "applied pressure" (pressure applied to obtain superconductivity), which is relevant for researchers because it can change radically the nature of a material. 
 % Unfortunately, SuperCon does not contain such property systematically. 
-SuperCon also lacks the "measurement method" (the method used to measure the Tc) for a) characterise multiple Tc obtained from the same material and, b) allow to distinguish calculated and experimental superconductors critical temperatures. 
+SuperCon also lacks the "measurement method" (the method used to measure the T\textsubscript{c}) for a) characterise multiple T\textsubscript{c} obtained from the same material and, b) allow to distinguish calculated and experimental superconductors critical temperatures. 
 
 % 5. What are the needs? Need for a tool of methods allowing automatic extraction (both approach: general for materials or SuperCon)
-In summary, there is a strong need for a tool to produce a structured database of superconductors materials in a sustainable way. 
+In summary, there is a strong need for a tool to produce a large structured database of superconductors materials in a sustainable way. 
 Ideally, our goal is to have a single tool that can be customised with ease to work in several domains. Nevertheless, at this stage, we focus only on superconductors materials research. 
 
 % 6. in this work we present X, where we did Y and obtain Z
-In this work, we present our system for automatically build a structured database of superconductors materials and properties, from scientific literature. The tool is called grobid-superconductors and is a module based on grobid~\cite{GROBID}, a machine learning library to parse and structure scientific documents, a tool that support PDFs natively, a diverse set of ML architetures (CRF, Recurrent Neural Networks (RNN) based on LSTM, and transformers where the contextual embedding can be selected between BERT and SciBERT, allowing it to work with the fulltext of scientific papers, not only the abstract.
-We developed grobid-superconductors and we trained using our previous work: SuperMat~\cite{foppiano2021supermat}, an corpus of annotated linked data of superconductors research articles.
-
+In this work, we present \textit{grobid-superconductors}: a system for automatically build a structured database of superconductors materials and properties from scientific literature. 
+The tool is a module based on grobid~\cite{GROBID}, a machine learning library to parse and structure scientific documents. Grobid provides native support for PDFs documents, a diverse set of ML architectures (Conditional Random Field (CRF), Recurrent Neural Networks (RNN) based on bidirectional LSTM, and transformers such as BERT\cite{devlin2018bert} or SciBERT~\cite{Beltagy2019SciBERT}. 
+We developed \textit{grobid-superconductors} and we trained it on SuperMat~\cite{foppiano2021supermat}, a corpus of annotated linked data of full-text articles from superconductor research.
 
 % 7. what is our purpose? 
-With this tool, we aim to create a database of superconductors materials and properties obtained by processing large quantities of documents. Furthermore, with the additional capabilities from grobid we expect to provide an effective curation interface which allow rapid development of a new version of SuperCon. 
-
-
-We create a database of 40324 records by processing 37770 superconductors research papers from ArXiv belonging to the category \textit{cond-mat.supr-cond}. 
-We named this new database  SuperCon\textsubscript{2} as the evolution of SuperCon. 
-This database contains 40234 records, of which 2052 with pressure and 3602 with a specified measurement method for Tc.
-
+We established a process for creating structured databases on large quantity of documents starting from superconductors materials and properties. 
+We create a database of 40324 records by processing 37770 superconductors research papers from ArXiv\footnote{\url{https://arxiv.org}} belonging to the category \textit{cond-mat.supr-cond}. We named this new database SuperCon\textsubscript{2} as the evolution of SuperCon, containing 2052 pair material-Tc including applied pressure and 3602 records containing an explicit measurement method for the measured T\textsubscript{c}.
+Furthermore, we exploit the native information from PDF document provided by Grobid to construct a workflow interface for rapid database curation. 
 
 
 \section{Grobid-superconductors}
 
 % Overview from the other paper, what are the differences and some repetition on the previous paper 
-Grobid-superconductor is the extraction system that allow the process of text or PDF documents to extract materials and corresponding properties. 
-We develop grobid-superconductors as a multi-steps tool based on the Grobid library~\cite{GROBID} following some principles previously discussed in a preliminary study~\cite{foppiano:hal-02870896}.  
-The choice to develop it on top of Grobid bring several advantages: a) It integrates with \textit{pdfalto}\footnote{\url{https://github.com/kermitt2/pdfalto}}, a specialised tool for PDF parsing which mitigate extraction issues such as the resolution of embedded fonts, invalid character encoding, and the reconstruction of the correct reading order. 
+\textit{Grobid-superconductor} is the extraction system that allow the process of text or PDF documents to extract materials and corresponding properties. 
+We develop \textit{grobid-superconductors} as a multi-steps tool based on the \textit{Grobid} library~\cite{GROBID} following some principles previously discussed in a preliminary study~\cite{foppiano:hal-02870896}.  
+The choice to develop it as a \textit{Grobid} module bring several advantages: a) It integrates with \textit{pdfalto}\footnote{\url{https://github.com/kermitt2/pdfalto}}, a specialised tool for PDF parsing which mitigate extraction issues such as the resolution of embedded fonts, invalid character encoding, and the reconstruction of the correct reading order. 
 Secondly, b) it allows to access to low level layout PDF information for both machine learning and document decoration and, finally, c) it provides access to a set of high-quality, pre-trained machine learning models for structuring documents.
 
 % Abstract vs fulltext
-The scope of grobid-superconductors is to process the whole full-text except figures and tables body which require a separate work on their own. 
-In general, at the time of writing this paper, most of the related work are working with the abstract only. This choice is well supported by the fact that abstracts are freely available, they are easier to obtain~\cite{kononova_text-mined_2019}, and contain more condensed information~\cite{yamaguchi-etal-2020-sc, court_magnetic_2020}. 
-However, we stress that working with full-text even is more challenging, it gives access to a wider spectrum of information: from background information (e.g. behaviour with under or over-doping), negative or partially negative results (e.g. absence of superconductivity for certain samples) which rarely discussed in the abstract. 
-To build a prediction model that is able to recognise non-superconductors materials is needed to obtain enough examples of non-superconductors materials and negative results or the model will assume there will always be a superconductors critical temperature. 
+The scope of \textit{grobid-superconductors} is to process the full-text of scientific articles. Figures and tables body, requiring a specific process, are ignored.
+At the time of writing this paper, we are aware of several related work applying machine learning on material data science that are developed with limitation of  only abstract text.
+The main reason is that abstracts are usually freely available, are easier to obtain~\cite{kononova_text-mined_2019}, and contain more condensed information~\cite{yamaguchi-etal-2020-sc, court_magnetic_2020}. 
+However, although working with full-text poses more challenges, it gives access to a wider spectrum of information such as background information (e.g. behaviour with under or over-doping) related to the studied materials. Even more important full-text might contains negative results (e.g. absence of superconductivity for certain samples) which are rarely discussed in the abstract. 
+Such examples are needed to supply knowledge of non-superconductivity when building a superconductors prediction model~\cite{stanev_machine_2017}. 
 
-Grobid-superconductors is then integrated in an ingestion workflow that supply PDF documents and store the resulting information in a database.
+\textit{Grobid-superconductors} provides a web API we use to integrat the extraction in an ingestion workflow (Section~\ref{sec:ingestion-workflow}) that supply PDF documents and store the resulting information in a database.
 
 % what makes us different from previous work 
 % Grobid-superconductors supports PDFs documents natively. This means that a) the system as access to additional layout information such as superscript, subscript, bold, italic, font name, font size which can be exploited for improved accuracy. And, b) we collect the coordinates in the document of any information that is extracted from PDF document.
@@ -131,57 +130,100 @@ Grobid-superconductors is then integrated in an ingestion workflow that supply P
 
 \subsection{Architecture}
 
-Grobid-superconductors is structured as a three-steps process: Document structuring and preprocessing (a) which transforms the input document or text into the internal representation. Extraction (b) is a Named Entities Recognition (NER) where the text is processed to recognise and extract material and properties like Tc, pressure. Finally, such extracted entities are combined in the Linking (c) step which tries to establish relations between them. 
+\textit{Grobid-superconductors} is structured as a three-steps process:  "Document structuring and pre-processing" (a) which transforms the input document or text into the internal representation. "Extraction" (b) is a Named Entities Recognition (NER) where the text is processed to recognise and extract material and properties. Finally, such extracted entities are combined in the final "Linking" (c) step which establish relations between them. 
 
 \begin{figure}[ht]
 \includegraphics[width=\textwidth]{overview-schema}
 \caption{Overview of the architecture}
 \end{figure}
 
-\subsubsection{Document structuring and preprocessing}
-The Document structuring and preprocessing component processes the PDF document into a internal model structured as a list of passages.
-Each Passage represents a chunk of text and attributes in the original document and contains the following properties: 
-\begin{itemize}
-    \item \textit{Layout tokens} represent the token with layout information, such as italic, bold, font type, font size, coordinates (a list of pairs x,y), index position within the text chain, superscript, and subscript. 
-    \item section contains the main sections: header, body and annex as they are divided into the Grobid "document segmentation model", 
-    \item subsection contains further division within the same section: paragraph, table or figure caption, abstract, title, 
-    \item markers are element of the text representing the "reference callout", symbols in the text that are referencing to the reference list at the end of the paper. They depends on the style on which the paper is written. 
-    The markers are collected and utilised for improve splitting paragraphs into sentences. They allow to correct invalid sentence splitting, for example when an abbreviation such as \textit{Foppiano et. al.} is mistakenly recognised as the end of the sentence. This method is very effective to improve sentence segmentation for scientific text. 
-    \item spans are used for later carry the extracted entities. One Span represent one entity with its type and position within the text. Spans can also store additional attributes using a key-value approach. For example a Tc is represented by their raw value in the text but we can attach additional representations, for example their normalised representation. 
-\end{itemize}
-
-In addition, during this step, the process outputs the bibliographic data of the paper combining the extracted information with a matching service to consolidate them against Crossref. In this way we ensure that the bibliograhpic data can match the publisher's information even if the paper was obtained from different sources, such as arXiv. The collected bibliographic data are: title, authors, DOI, publisher, journal, and year of publication.
+\subsubsection{Document structuring and pre-processing}
+The Document structuring and pre-processing component processes the PDF document into a internal model structured as a list of text sentences.
 
 % Internal process
-The document is processed using Grobid native models such as the segmentation model for recognising the macro areas in a document (header, body and annex) and each obtained section is passed to more specialised models in a cascade. For example the header information is further processed by the Header model, which further decomposed into: title, authors, keywords, abstract. 
-For what concern the body and annex of a paper, they are processed into a model for fulltext that recognises paragraphs, reference callout, tables and figure zones. 
-The text and the reference markers are then passed to a sentence segmenter called Blingfire (\url{https://github.com/microsoft/blingfire}) which transforms paragraphs into sentences. 
+The input document is processed using Grobid native models as illustrated in Figure~\ref{fig:grobid-document-processing}. After being transformed in XML by \textit{pdfalto}, it is passed to the "segmentation model" for recognising the macro areas (header, body and annex). As a result, the obtained sections are passed to specialised models in a cascade architecture. The header is further processed by the Header model, which further extracts the structure. We selectively extract title, abstract, keywords, publisher, publication year, doi and ignore other items, such as authors, publication date. 
+Body and annexes are processed by the "Fulltext" model that recognises paragraphs, reference markers (decorations (also called \textit{reference callout}) in the text referring to the citation references at the end of the paper), tables and figure zones.
+Tables and figures zones are further decomposed by the respective models and we retain only the caption text. 
 
-The sentences are accumulated as list of passages where each sentence represent a generic text passage. 
-The following steps are attaching information to this bare structure. 
+\begin{figure}[ht]
+\label{fig:grobid-document-processing}
+\includegraphics[width=\textwidth]{grobid-extraction-schema}
+\caption{Cascade architecture in the document structuring with Grobid.}
+\end{figure}
 
+The text is finally passed to a sentence segmenter (we use Apache OpenNLP (\url{https://opennlp.apache.org})) which splits paragraphs into sentences. We use the reference markers collected from the text improve the sentence segmentation process: the segmentation is cancelled if the end of sentence falls within the boundaries of one reference marker. For example is often the case that a reference in the form of \textit{Foppiano et. al.} is mistakenly recognised as the end of the sentence. This method is very effective to enhance sentence segmentation in scientific text. 
+The sentences are accumulated into special objects that represent general text passages containing the following properties: 
+\begin{itemize}
+    \item \textit{LayoutTokens} represent the token with layout information, such as style (italic, bold, superscript, and subscript), font (font type, font size), positions (coordinates (a list of pairs x,y), index position within the text chain), 
+    \item \textit{section} contains the main sections: header, body and annex as they are divided from the Grobid "document segmentation model", 
+    \item \textit{subsection} contains further division within the same section: paragraph, table or figure caption, abstract, title, 
+    \item \textit{spans} are allocated to carry the extracted entities in the following step. One \textit{span} represents one entity with its type and position within the text. Spans can also store additional attributes using a key-value approach. For example a T\textsubscript{c} is represented by their form in the text but we can attach additional formats, for example their normalised representation. 
+\end{itemize}
+
+During the \textit{Document structuring and pre-processing}, the process extracts also the bibliographic data of the paper by combining the extracted information with a matching service to consolidate them against CrossRef\footnote{\url{https://www.crossref.org}}. In this way we ensure that the bibliographic data can match the publisher's information even if the paper was obtained from different sources, such as ArXiv. We collect the following bibliographic: title, authors, DOI, publisher, journal, and year of publication.
+
+The following step of Extraction and Linking are enriching the internal structure by attaching additional structured information. 
+
+\textbf{---- Revised till here -- following is WIP!}
 
 \subsubsection{Extraction}
 
-The second step in the chain is the \textit{Extraction} and it is responsible for extracting information from text in the form of entities. 
-This process is a NER task for nine type of entities: \texttt{<material>}, \texttt{<tcValue>}, T\textsubscript{c} expressions \texttt{<tc>}, \texttt{<pressure>}, measurement methods \texttt{<me\_method>}, crystal structure, space groups and unit cells. 
-Entities of type materials are further decomposed into \texttt{<formula>}, \texttt{<name>}, \texttt{<substrate>}, \texttt{<fabrication>}, \texttt{<value>} and \texttt{<variables>}, \texttt{<doping>}, \texttt{<shape>} as illustrated in Figure~\ref{fig:extraction-ml-models-cascade-architecture}
+The second step in the architecture is the \textit{Extraction}, a named entities recognition (NER) from text. 
+We designed this component as aggregation of multiple parsers focused on specific extractions and combining multiple machine learning models and rule-based algorithms.
+The machine learning models can be trained using multiple architectures thanks to the integration with Grobid and the DeLFT (Deep Learning For Text) library~\cite{DeLFT}. 
+We provides models for Conditional Random Field (CRF), Recurrent Neural Networks (RNN) using Bidirectional LSTM with CRF (BidLSTM\_CRF~\cite{Lample2016NeuralAF}), and Transformers (SciBERT~\cite{Beltagy2019SciBERT}).
+The rule-based parsers are implemented using SpaCy (\url{https://spacy.io} entity ruler.
+
+Figure~\ref{fig:extraction-ml-models-cascade-architecture} illustrates the data flow, the interaction of the parsers and the output information. We describe in details in the following paragraphs.  
 
 \begin{figure}[ht]
 \label{fig:extraction-ml-models-cascade-architecture}
 \includegraphics[width=\textwidth]{extraction-schema-2}
-\caption{Cascade architecture in the superconductors parser.}
+\caption{Cascade architecture combining the superconductors and material parsers.}
 \end{figure}
 
-We developed the Extraction using mainly Machine Learning (ML) (Figure~\ref{fig:extraction-ml-models-cascade-architecture} with a secondary extraction rule-based.
-The \textbf{machine learning}, implements three possible architectures: Conditional Random Field (CRF), Recurrent Neural Networks (RNN) using Bidirectional LSTM with CRF (BidLSTM\_CRF), and, in certain cases, Transformers (Scibert). They implements the following models: 
-\begin{itemize}
-    \item \textbf{superconductors parser} which combines two models: superconductors and quantities. The former was trained using SuperMat and aims to extract the main entities \texttt{<material>}, \texttt{<tcValue>}, T\textsubscript{c} expressions \texttt{<tc>}, \texttt{<pressure>}, measurement methods \texttt{<me\_method>} while the latter focuses only on quantities, in particular temperature and pressures. The pressures and temperatures that are overlapping beftween the two models are merged by prioritizing the largest matches. Trained with data from SuperMat~\cite{foppiano2021supermat} with evaluation results in Table~\ref{tab:evaluation-10fold-superconductors-parser}.
-    \item \textbf{material parser} is used to further decompose \texttt{<material>} entities into additional attributes such as doping, formula and so on. The material parser also uses additional techniques to decompose formula into composition and to transform name into formula (e.g. hydrogen in H). In addition when a material is in the stochiometric form and it contains the substitution variables, the material parser tries to substitute and create n formula using permutation. For example the stochiometric formula \texttt{La 4 Fe 2 A 1-x O 7 (A=Mg,Co; x=0.1,0.2)} will permute the values of A and x to obtain \texttt{La 4 Fe 2 Mg 0.9 O 7}, \texttt{La 4 Fe 2 Mg 0.8 O 7}, \texttt{La 4 Fe 2 Co 0.9 O 7}, \texttt{La 4 Fe 2 Co 0.8 O 7}. Trained with data from SuperMat~\cite{foppiano2021supermat} and its results are available in Table~\ref{tab:evaluation-10fold-material-parser}. Since the performances with CRF or RNN are above 90\%, we do not supply the model based on transformers for this task. 
-    \item \textbf{quantities parser} from the project \textit{grobid-quantities}~\cite{foppiano2019quantities} and trained on scientific text. This model is trained to extract any type of quantities of measurement. We keep only temperatures and pressures and we merge the entities that are partially or completely overlapping with the superconductors \texttt{<tcValue>} or \texttt{<pressure>} entities and we keep the largest matches. 
-\end{itemize}
+\paragraph{Superconductors parser} combines two ML models (superconductors and quantities) and three RB extractors. The former was trained using SuperMat and aims to extract the main entities \texttt{<material>}, \texttt{<tcValue>}, T\textsubscript{c} expressions \texttt{<tc>}, \texttt{<pressure>}, measurement methods \texttt{<me\_method>} while the latter focuses only on quantities, in particular temperature and pressures. The pressures and temperatures that are overlapping between the two models are merged by prioritizing the largest matches. Trained with data from SuperMat~\cite{foppiano2021supermat} with evaluation results in Table~\ref{tab:evaluation-10fold-superconductors-parser}.
 
-\textbf{Rule-based} using a set of "phrase matchers" (\url{https://spacy.io} engines for extracting finite set of  crystal structure, space groups and unit cells. The space groups are taken from the list in Wikipedia\footnote{\url{https://en.wikipedia.org/wiki/List_of_space_groups}}. This component will be integrated in the SuperMat corpus in future to improve the tolerance to noise. 
+\paragraph{material parser} is used to further decompose \texttt{<material>} entities into additional attributes such as doping, formula and so on. The material parser also uses additional techniques to decompose formula into composition and to transform name into formula (e.g. hydrogen in H). In addition when a material is in the stochiometric form and it contains the substitution variables, the material parser tries to substitute and create n formula using permutation. For example the stochiometric formula \texttt{La 4 Fe 2 A 1-x O 7 (A=Mg,Co; x=0.1,0.2)} will permute the values of A and x to obtain \texttt{La 4 Fe 2 Mg 0.9 O 7}, \texttt{La 4 Fe 2 Mg 0.8 O 7}, \texttt{La 4 Fe 2 Co 0.9 O 7}, \texttt{La 4 Fe 2 Co 0.8 O 7}. Trained with data from SuperMat~\cite{foppiano2021supermat} and its results are available in Table~\ref{tab:evaluation-10fold-material-parser}. Since the performances with CRF or RNN are above 90\%, we do not supply the model based on transformers for this task. 
+
+\paragraph{quantities parser} from the project \textit{grobid-quantities}~\cite{foppiano2019quantities} and trained on scientific text. This model is trained to extract any type of quantities of measurement. We keep only temperatures and pressures and we merge the entities that are partially or completely overlapping with the superconductors \texttt{<tcValue>} or \texttt{<pressure>} entities and we keep the largest matches. 
+
+It recognises nine type of entities synthesised in Table~\ref{tab:superconductors-model-entities}, the entities extracted by machine learning are described more in details in~\cite{foppiano2021supermat}.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{m{10em} m{25em}}
+\hline 
+\textbf{Entity} (\textbf{Tag})& \textbf{Description} \\ 
+\hline
+\hline
+\multicolumn{2}{c}{\textbf{Machine learning}} \\
+\hline
+Material (\texttt{<material>}) & Materials and samples names, formulas, including stochiometric formulas, substitution variables of values and elements, shape, doping, substrate \\
+Class (\texttt{<class>}) & Groups of materials having similar characteristics or common strategic compounds that define their nature \\
+T\textit{c} value (\texttt{<tcValue>})& \\
+T\textit{c} expressions (\texttt{<tc>}) & Expressions in the text that provide information about the phenomenon of superconductivity related to a value, interval or variation of the T\textsubscript{c}\\
+Measurement methods (\texttt{<me\_method>}) & Techniques used to measure or calculate the presence of superconductivity. \\
+Applied pressure (\texttt{<pressure>}) & Applied pressure when superconductivity is recorded\\
+\hline
+\hline
+\multicolumn{2}{c}{\textbf{Rule-based}} \\
+\hline
+Crystal structure & Geometry of arrangement of particles in the unit cell\\
+Space groups  & Symmetry group, usually in three dimensions\\
+Unit cells & A repeating unit formed by the vectors spanning the points of a lattice\\
+\hline
+\end{tabular}
+\label{tab:superconductors-model-entities}
+\caption{Synthesis of the superconductors parser entities. }
+\end{table}
+
+The \textit{Extraction} is also designed with a cascade architecture: entities of type \texttt{<materials>} are further decomposed into \texttt{<formula>}, \texttt{<name>}, \texttt{<substrate>}, \texttt{<fabrication>}, \texttt{<value>} and \texttt{<variables>}, \texttt{<doping>}, \texttt{<shape>} as illustrated in Figure~\ref{fig:extraction-ml-models-cascade-architecture}.
+
+They implements the following models: 
+
+
+ for extracting finite set of crystal structure, space groups and unit cells. The space groups are taken from the list in Wikipedia\footnote{\url{https://en.wikipedia.org/wiki/List_of_space_groups}}. This component will be integrated in the SuperMat corpus in future to improve the tolerance to noise. 
 
 \begin{table}[ht]
 \centering
@@ -250,7 +292,7 @@ Our implementation uses a main rule-based method and a secondary approach based 
 % Algorithm in brief (three or four different scenario): 
 \paragraph{T\textsubscript{c} classification}
 For linking the T\textsubscript{c} to any other entity type, there is an additional step to classify the temperature into "superconducting" or "non-superconducting" critical temperatures. 
-The classification is rule-based and combines the extracted entities of Tc expressions (label \texttt{<tc>}) with a set of predefined standard names. 
+The classification is rule-based and combines the extracted entities of T\textsubscript{c} expressions (label \texttt{<tc>}) with a set of predefined standard names. 
 If a T\textsubscript{c} is not considered a "superconducting critical temperature", it's excluded from the list of possible linking candidates. 
 
 \paragraph{Rule-based linking}
@@ -334,6 +376,7 @@ Discussion of the results, which problems are currently emerging what are the pr
 Introduction of the database, which data was extracted and the format 
 
 \subsection{Ingestion workflow}
+\label{subsec:ingestion-workflow}
 
 \begin{figure}[ht]
 \includegraphics[width=\textwidth]{workflow-schema-1}
@@ -345,9 +388,11 @@ Quickly discussion on the ingestion workflow
 
 
 \subsection{User interface}
+\label{sucsec:supercon2-user-interface}
 
 
 \section{Conclusion}
+\label{sec:conclusion}
 
 \bibliography{bibliography}
 \bibliographystyle{plain}
