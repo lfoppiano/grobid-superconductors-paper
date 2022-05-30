@@ -6,6 +6,7 @@
 \usepackage{authblk}
 \usepackage{csquotes}
 \usepackage{array}
+\usepackage{amssymb}
 
 \providecommand{\keywords}[1]
 {
@@ -164,17 +165,12 @@ During the \textit{Document structuring and pre-processing}, the process extract
 
 The following step of Extraction and Linking are enriching the internal structure by attaching additional structured information. 
 
-\textbf{---- Revised till here -- following is WIP!}
-
 \subsubsection{Extraction}
 
-The second step in the architecture is the \textit{Extraction}, a named entities recognition (NER) from text. 
-We designed this component as aggregation of multiple parsers focused on specific extractions and combining multiple machine learning models and rule-based algorithms.
-The machine learning models can be trained using multiple architectures thanks to the integration with Grobid and the DeLFT (Deep Learning For Text) library~\cite{DeLFT}. 
-We provides models for Conditional Random Field (CRF), Recurrent Neural Networks (RNN) using Bidirectional LSTM with CRF (BidLSTM\_CRF~\cite{Lample2016NeuralAF}), and Transformers (SciBERT~\cite{Beltagy2019SciBERT}).
+The second step in the architecture is the \textit{Extraction}, a named entities recognition (NER) task.
+We designed this component as aggregation of multiple parsers with a final post-processing. Each parser focuses on specific extractions and combining multiple machine learning models and rule-based algorithms.
+The machine learning models can be trained using multiple architectures thanks to the integration between Grobid and the DeLFT (Deep Learning For Text) library~\cite{DeLFT}. 
 The rule-based parsers are implemented using SpaCy (\url{https://spacy.io} entity ruler.
-
-Figure~\ref{fig:extraction-ml-models-cascade-architecture} illustrates the data flow, the interaction of the parsers and the output information. We describe in details in the following paragraphs.  
 
 \begin{figure}[ht]
 \label{fig:extraction-ml-models-cascade-architecture}
@@ -182,17 +178,20 @@ Figure~\ref{fig:extraction-ml-models-cascade-architecture} illustrates the data 
 \caption{Cascade architecture combining the superconductors and material parsers.}
 \end{figure}
 
-\paragraph{Superconductors parser} combines two ML models (superconductors and quantities) and three RB extractors. The former was trained using SuperMat and aims to extract the main entities \texttt{<material>}, \texttt{<tcValue>}, T\textsubscript{c} expressions \texttt{<tc>}, \texttt{<pressure>}, measurement methods \texttt{<me\_method>} while the latter focuses only on quantities, in particular temperature and pressures. The pressures and temperatures that are overlapping between the two models are merged by prioritizing the largest matches. Trained with data from SuperMat~\cite{foppiano2021supermat} with evaluation results in Table~\ref{tab:evaluation-10fold-superconductors-parser}.
+Figure~\ref{fig:extraction-ml-models-cascade-architecture} illustrates the data flow with the interaction between parsers and the extracted entity types. 
 
-\paragraph{material parser} is used to further decompose \texttt{<material>} entities into additional attributes such as doping, formula and so on. The material parser also uses additional techniques to decompose formula into composition and to transform name into formula (e.g. hydrogen in H). In addition when a material is in the stochiometric form and it contains the substitution variables, the material parser tries to substitute and create n formula using permutation. For example the stochiometric formula \texttt{La 4 Fe 2 A 1-x O 7 (A=Mg,Co; x=0.1,0.2)} will permute the values of A and x to obtain \texttt{La 4 Fe 2 Mg 0.9 O 7}, \texttt{La 4 Fe 2 Mg 0.8 O 7}, \texttt{La 4 Fe 2 Co 0.9 O 7}, \texttt{La 4 Fe 2 Co 0.8 O 7}. Trained with data from SuperMat~\cite{foppiano2021supermat} and its results are available in Table~\ref{tab:evaluation-10fold-material-parser}. Since the performances with CRF or RNN are above 90\%, we do not supply the model based on transformers for this task. 
-
-\paragraph{quantities parser} from the project \textit{grobid-quantities}~\cite{foppiano2019quantities} and trained on scientific text. This model is trained to extract any type of quantities of measurement. We keep only temperatures and pressures and we merge the entities that are partially or completely overlapping with the superconductors \texttt{<tcValue>} or \texttt{<pressure>} entities and we keep the largest matches. 
-
-It recognises nine type of entities synthesised in Table~\ref{tab:superconductors-model-entities}, the entities extracted by machine learning are described more in details in~\cite{foppiano2021supermat}.
+\paragraph{Superconductors parser} combines two ML models (\textit{superconductors ML model} and \textit{quantities ML model}) and two RB extractors (\textit{crystal structures entity ruler} and \textit{space groups entity ruler}). 
+The \textit{superconductors ML model} is trained trained using SuperMat~\cite{foppiano2021supermat} (Table~\ref{tab:evaluation-10fold-superconductors-parser}) and aims to extract the main entities from the superconductors domain.
+We provide models trained using Conditional Random Field (CRF), Recurrent Neural Networks (RNN) using Bidirectional LSTM with CRF (BidLSTM\_CRF~\cite{Lample2016NeuralAF}), and Transformers (SciBERT~\cite{Beltagy2019SciBERT}).
+The \textit{quantities ML model} is a model specialised in extracting quantities of measurements from the \textit{grobid-quantities}~\cite{foppiano2019quantities} project and trained on scientific text.
+We filter entities extracted by the \textit{quantities ML model} to retain only temperatures and pressures and we merge them with the entities extracted by the \textit{superconductors ML model} to remove duplicates or keep the largest matches.
+Finally, the rule-based components are extracting the crystal structures, the space groups and the unit cells. We use rule based because the number of items is finite with lower variation.  
+The extracted entities are summarised in Table~\ref{tab:superconductors-parser-entities}. More details about the definition of the machine learning entities can be obtained in the work on SuperMat~\cite{foppiano2021supermat}.
 
 \begin{table}[ht]
 \centering
-\begin{tabular}{m{10em} m{25em}}
+\scalebox{0.7}{
+\begin{tabular}{m{19em} m{30em}}
 \hline 
 \textbf{Entity} (\textbf{Tag})& \textbf{Description} \\ 
 \hline
@@ -201,7 +200,7 @@ It recognises nine type of entities synthesised in Table~\ref{tab:superconductor
 \hline
 Material (\texttt{<material>}) & Materials and samples names, formulas, including stochiometric formulas, substitution variables of values and elements, shape, doping, substrate \\
 Class (\texttt{<class>}) & Groups of materials having similar characteristics or common strategic compounds that define their nature \\
-T\textit{c} value (\texttt{<tcValue>})& \\
+T\textit{c} value (\texttt{<tcValue>})& The value of the superconductors critical temperature\\
 T\textit{c} expressions (\texttt{<tc>}) & Expressions in the text that provide information about the phenomenon of superconductivity related to a value, interval or variation of the T\textsubscript{c}\\
 Measurement methods (\texttt{<me\_method>}) & Techniques used to measure or calculate the presence of superconductivity. \\
 Applied pressure (\texttt{<pressure>}) & Applied pressure when superconductivity is recorded\\
@@ -209,21 +208,64 @@ Applied pressure (\texttt{<pressure>}) & Applied pressure when superconductivity
 \hline
 \multicolumn{2}{c}{\textbf{Rule-based}} \\
 \hline
-Crystal structure & Geometry of arrangement of particles in the unit cell\\
-Space groups  & Symmetry group, usually in three dimensions\\
-Unit cells & A repeating unit formed by the vectors spanning the points of a lattice\\
+Crystal structure (\texttt{<crystal-structure>}) & Geometry of arrangement of particles in the unit cell\\
+Space groups  (\texttt{<space-group>}) & Symmetry group, usually in three dimensions\\
+Unit cells (\texttt{<unit-cells>}) & A repeating unit formed by the vectors spanning the points of a lattice\\
 \hline
 \end{tabular}
-\label{tab:superconductors-model-entities}
+}
+\label{tab:superconductors-parser-entities}
 \caption{Synthesis of the superconductors parser entities. }
 \end{table}
 
-The \textit{Extraction} is also designed with a cascade architecture: entities of type \texttt{<materials>} are further decomposed into \texttt{<formula>}, \texttt{<name>}, \texttt{<substrate>}, \texttt{<fabrication>}, \texttt{<value>} and \texttt{<variables>}, \texttt{<doping>}, \texttt{<shape>} as illustrated in Figure~\ref{fig:extraction-ml-models-cascade-architecture}.
+\paragraph{Material parser} is used to further structure the \texttt{<material>} entities from the \textit{Superconductors parser}. 
+First, the material raw string is passed through a \textit{material ML model} to extract several attributes, summarised in Table~\ref{tab:material-parser-entities}. 
+This model is trained using annotated material raw strings (Table~\ref{tab:evaluation-10fold-material-parser}). 
+We provide models trained using CRF and RNN.
+%Since the performances with CRF or RNN are above 90\%, we do not supply the model based on transformers for this task. 
+Then, we apply several processing based on which information are available: 
+\begin{itemize}
+    \item we decompose the formula into a structured composition and we identify each group of compounds and values using a combination between mat2chem~\cite{kononova_text-mined_2019} and Pymatgen~\cite{Ong2013}, 
+    \item we obtain the formula corresponding to the material name, if the name available and the formula is not (e.g. hydrogen to \textit{H}), 
+    \item we calculate the classes from the formula composition, using a simple algorithm we have designed which can return values such as Cuprate, Oxides, Alloys 
+    \item using the extracted variables and values we apply permutation to the stochiometric formula to resolve the substitutions. For example the stochiometric formula \texttt{La 4 Fe 2 A 1-x O 7 (A=Mg,Co; x=0.1,0.2)} will permute the values of A and x to obtain \texttt{La 4 Fe 2 Mg 0.9 O 7}, \texttt{La 4 Fe 2 Mg 0.8 O 7}, \texttt{La 4 Fe 2 Co 0.9 O 7}, \texttt{La 4 Fe 2 Co 0.8 O 7}.
+\end{itemize}
 
-They implements the following models: 
+\begin{table}[ht]
+\centering
+\scalebox{0.7}{
+\begin{tabular}{m{16em} m{30em}}
+\hline 
+\textbf{Entity} (\textbf{Tag})& \textbf{Description} \\ 
+\hline
+Name (\texttt{<name>}) & The canonical name of a material (e.g. Hydrogen, PCCO, Carbon) \\
+Formula (\texttt{<formula>}) & Chemical formula of the material (e.g. \texttt{Pr1.869Ce0.131CuO 4-}, \texttt{MgB2}, \texttt{La 2-x Sr x CuO 4}) \\
+Doping (\texttt{<doping>})& Doping ratio and doping materials that are adjointed to the material name (e.g. \\
+Shape (\texttt{<shape>}) & shape of the material (e.g. single crystal, polycrystaline, thin film, powder, film) \\
+Substitution variables (\texttt{<variable>}) & Variables that can be substituted in the formula. \\
+Substitution values (\texttt{<value>}) & Values expressed in the stoichiometric doping. \\
+Substrate (\texttt{<substrate>}) & Substrates as defined in the material name \\
+Fabrication (\texttt{<fabrication>}) & Represent eventual additional information that are not belonging to any of the previous tags  (e.g. intercalated, electron-doped)\\
+\hline
+\end{tabular}
+}
+\label{tab:material-parser-entities}
+\caption{Synthesis of the material parser entities. }
+\end{table}
 
+\paragraph{Post-processing} The post-processing is the final step of the extraction and has the objective of running aggregations at document level. We utilise the decomposed formulas to aggregate the mention in the document that is referring to the same material. 
+For example we could aggregate simple cases such as \texttt{hydrogen} and \texttt{H} but also a complex stochiometric formula (e.g. \texttt{La 2 Fe 1-x O 7 (x = 0.1, 0.2)} with formulas discussed further in the paper. 
 
- for extracting finite set of crystal structure, space groups and unit cells. The space groups are taken from the list in Wikipedia\footnote{\url{https://en.wikipedia.org/wiki/List_of_space_groups}}. This component will be integrated in the SuperMat corpus in future to improve the tolerance to noise. 
+\paragraph{Discussion on machine learning evaluation}
+
+In this section we discuss the machine learning evaluation scores for the superconductors and materials ML models. The evaluation was performed using the 10-fold cross validation to obtain precision, recall and f1 score. The overall scores were calculated using the micro average which compensate the different balance of entities annotations. 
+
+The superconductors model is detailed in Table~\ref{tab:evaluation-10fold-superconductors-parser} and obtained the best result using transformers, in particular SciBERT had a F1 score of 83.46\% and recall around 85\%. Both deep learning approaches (SciBERT and RNN) showed most of the gains in the recall.
+We noticed that the CRF approach had more difficulty to extract large entities which were partially extracted. 
+In term of performances, the CRF is the fastest approach and the SciBERT is the slowest, limited by the large neural network that needs to be loaded in memory.
+Overall, the BidLSTM+CRF (RNN) had the best trade-off between performances and throughput, as compared with the SciBERT approach. 
+
+We notice that \texttt{<pressure>} results in lower performances and the reason due to the lack of enough training data as compared with the rest of the labels. 
 
 \begin{table}[ht]
 \centering
@@ -246,6 +288,9 @@ All (micro avg) & 82.43 & 79.68 & 81.03 & \textbf{83.01} & 82.89 & 82.95 & 83.01
 \label{tab:evaluation-10fold-superconductors-parser}
 \end{table}
 
+The material parser is provided in two architectures: CRF and BidLSTM+CRF because the performances are above 95\% and the SciBERT approach is very slow. 
+Surprisingly, this model performs better using the CRF than the RNN. We notice that \texttt{<fabrication>} and \texttt{<substrate>} have relatively low results, for the same reason of \texttt{<pressure>} of lack of enough training data.
+[PO we can potentially extend this part adding an additional section discussing NER]
 
 \begin{table}[ht]
 \centering
@@ -269,53 +314,46 @@ all  (micro avg)       & 96.87   & 96.51    & 96.68  & 95.75 &   96.44  &  96.09
 \label{tab:evaluation-10fold-material-parser}
 \end{table}
 
-In Table~\ref{tab:evaluation-10fold-superconductors-parser} and~\ref{tab:evaluation-10fold-material-parser} we illustrate the evaluation scores for the superconductors and materials parsers models using 10-fold cross-validation. 
-The superconductors parser (Table~\ref{tab:evaluation-10fold-superconductors-parser}) best result was achieved using transformers, in particular SciBERT had a F1 score of 83.46\% and recall around 85\%. It's worth noticing that the SciBERT approach is the slowest to comupute and requires a server with a proper GPU.
-However, the BidLSTM+CRF (RNN) had the best trade-off between performances and throughput, as compared with the SciBERT approach. 
-
-We notice that \texttt{<pressure>} results in lower performances and the reason due to the lack of enough training data as compared with the rest of the labels. 
-
-The materials parser is provided in two architectures: CRF and BidLSTM+CRF because the performances are above 95\% and SciBERT approach is very slow. 
-In this model \texttt{<fabrication>} and \texttt{<substrate>} have relatively low results, for the same reason of \texttt{<pressure>} of lack of enough training data.
-[PO we can potentially extend this part adding an additional section discussing NER]
 
 \subsubsection{Linking}
 
 %Introduction of the linking
-The Linking is the step that aims to link together entities previously extracted.
+The Linking is the final step of the processing that aims to link together entities previously extracted.
 %Objective of the linking
 We can formalised it as follows. \textit{Given a text T and two or more entities e\textsubscript{1}...e\textsubscript{n} of two types t\textsubscript{1} and t\textsubscript{2}, determine links between entities of type t\textsubscript{1} can be linked to entities of type t\textsubscript{2} .} 
 
-We have experimented several options: dependency parsing, rule-based, and sequence labelling. 
-Our implementation uses a main rule-based method and a secondary approach based on sequence labelling. The dependency parsing was studied using several approaches from scientific literature~\cite{yoshikawa:2017acl, Tiktinsky2020pyBARTES, swayamdipta:17, zhou-zhao-2019-head} and it was discarded. We found two main reasons a) the difficulty to find parser that were trained or performing on scientific text, and, by consequence, b) the implementation was converging toward a complex set of rules which were compensating for the poor performances on the dependency parser.
+%We have experimented several options: dependency parsing, rule-based, and sequence labelling. 
+Our implementation uses a main rule-based method and a secondary approach based on sequence labelling. The dependency parsing was studied using several approaches from scientific literature~\cite{yoshikawa:2017acl, Tiktinsky2020pyBARTES, swayamdipta:17, zhou-zhao-2019-head} and it was discarded because a) it is challenging to find parser performing well on scientific text, and, by consequence, b) our implementation was converging toward a complex set of rules to compensate for the poor performances of the dependency parser.
 
 % Algorithm in brief (three or four different scenario): 
 \paragraph{T\textsubscript{c} classification}
-For linking the T\textsubscript{c} to any other entity type, there is an additional step to classify the temperature into "superconducting" or "non-superconducting" critical temperatures. 
+For linking the T\textsubscript{c} to any other entity type, there is an classification engine for deciding whether the temperature entity is  "a superconducting critical temperature" or not. 
 The classification is rule-based and combines the extracted entities of T\textsubscript{c} expressions (label \texttt{<tc>}) with a set of predefined standard names. 
-If a T\textsubscript{c} is not considered a "superconducting critical temperature", it's excluded from the list of possible linking candidates. 
+If a T\textsubscript{c} is not considered a "superconducting critical temperature" is excluded from the list of possible linking candidates. 
 
 \paragraph{Rule-based linking}
-The rule-based approach works with two main scenarios: a) when entities to be linked have cardinality one they are linked automatically, and b) when they have higher cardinality they are linked "by distance" or "in order", depending on the structure of the sentence. 
+The rule-based approach works with two main scenarios: a) if entities to be linked have cardinality one in the sentence, they are linked automatically, and b) when their cardinality is higher then they are linked "by distance" or "in order", depending on the structure of the sentence. 
 If the word \textit{"respectively"} appears in the sentence, entities are linked "in order", otherwise they are linked "by distance". 
-For example, the sentence containing the word "respectively":  
+For example, the sentence:  
 \begin{displayquote}
 P-or Ba-122  and Co-doped Ba-122 have lower T c s of about 30 K and 24 K, respectively, which makes helium free operation questionable.
 \end{displayquote}
-is processed linking the materials in order: \textit{P-or Ba122} is assigned to \textit{30 K} and \textit{Co-doped Ba-122} to \textit{24 K}.
-The "in order" method is very sensible to missing entities, for example if one entity is not extracted by mistake it will incorrectly assign all the entities in the block. To avoid this, if the entities are unbalanced we reduce the search space as follows: 
+containing the word "respectively" and therefore is processed by linking the materials in order: \textit{P-or Ba122} is assigned to \textit{30 K} and \textit{Co-doped Ba-122} to \textit{24 K}.
+The "in order" method is very sensible to missing entities, for example if one entity is not extracted by mistake it will rick to incorrectly assign all the entities in the block. To avoid this, if the entities are unbalanced we reduce the search space as follows: 
 \begin{itemize}
-    \item 3 entities of type\textsubscript{1} vs 2 entities of type\textsubscript{2}: we shift the starting point to start at the second entity 
-    \item 2 entities of type\textsubscript{1} vs 3 entities of type\textsubscript{2}: we shift the ending point at the n\textsubscript{-1} entity
+    \item m entities of type\textsubscript{1} vs n entities of type\textsubscript{2} with $m > n$: we shift the starting point to start at the second entity 
+    \item m entities of type\textsubscript{1} vs n entities of type\textsubscript{2} with $m < n$: we shift the ending point at the n\textsubscript{-1} entity
 \end{itemize}
-In this way we avoid that the entities in surplus are just ignored. 
+With this sentence structure we know that the entities are in order, however if one is missing we just ignore the entities in surplus without disrupting the assignment. 
 
-We define the distance measurement \textit{d} calculated in characters, from the centre of the entities. The entity can be expanded if surrounded by parenthesis, and centre can be adjusted. Since the parenthesis become a block on itself, all its content refers to the same entity. 
+We define the distance measurement \textit{d} as a value calculated in numbers of characters from the centre of the entities. 
+If the entity is surrounded by parenthesis we expand it to the whole parenthesis and centre is shifted and all its content refers to the same entity. 
 As an example, in the sentence
 \begin{displayquote}
 We tested two materials MgB2 (Tc = 39K) and LaFe (Tc = 16K).
 \end{displayquote}
-both temperatures are expanded to their containing parenthesis \texttt{39K} to \texttt{(Tc = 39K)}, moving the centre toward the left. As a result, the distance tend to be shorter to entities immediately closed to the whole parenthesis block. Moreover, the impact of the dimension of the whole parenthesis block is reduced when calculating the distance. 
+both temperatures are expanded to their containing parenthesis e.g. \texttt{39K} to \texttt{(Tc = 39K)}, moving the centre toward the left. 
+As a result, the distance tend to be shorter to entities immediately closed to the whole parenthesis block and the impact of the dimension of the whole parenthesis block is reduced when calculating the distance (the entity could be on each side within the parenthesis). 
 
 The distance calculation is also adjusted with the addition of "penalties", that is, the distance is doubled when certain keywords such as "and", ", ", "." representing logical separation of predicates appear in the sentence. The rationale is that element between two separated predicates are likely not to be linked although they might be at a smaller distance. 
 
@@ -331,6 +369,7 @@ This approach has a obvious limitation to linking subsequent entities.
     % \item \textbf{material-space\_group} to link the material to their space groups.
 \end{itemize}
 
+\paragraph{Discussion on evaluation}
 The evaluation is shown in Table \ref{table:evaluation-linking}. 
 The rule-based was tested using the SuperMat~\cite{foppiano2021supermat} corpus which contains linked entities. Each test was framed to test the linking between two entities type. 
 The result of the \texttt{material-tcValue} obtained above 80\% F1 score with a precision of 88\%. We would like to stress we strive to obtain higher precision scores. 
@@ -355,10 +394,12 @@ This is the main cause of the lower score of \texttt{tcValue-me\_method}.
 
 \subsection{End to end evaluation}
 
-What is the end 2 end evaluation? 
-How the end 2 end evaluation is performed? 
+% What is the end 2 end evaluation? 
+The end to end evaluation (e2e evaluation) measures the real capability from beginning to the end of the process. The evaluation of the different steps are useful but not sufficient to assess their quality. 
 
-Discussion of the results, which problems are currently emerging what are the prospective for the future?
+We perform e2e evaluation manually. First we process a dataset of 500 documents, then we select a representative amount. In Table~\ref{table:end2end-evaluation} we illustrate the results. 
+
+The F1-score is close to 70\% with precision at 73\% and recall at 66\%.
 
 \begin{table}[ht]
 \centering
@@ -370,6 +411,8 @@ Discussion of the results, which problems are currently emerging what are the pr
 \label{table:end2end-evaluation}
 \caption{End 2 end evaluation scores. }
 \end{table}
+
+Discussion of the results, which problems are currently emerging what are the prospective for the future?
 
 \section{Supercon\textsuperscript{2}}
 
