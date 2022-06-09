@@ -7,7 +7,7 @@
 \usepackage{csquotes}
 \usepackage{array}
 \usepackage{amssymb}
-
+\newcommand{\tc}{T$_{c}$}
 \providecommand{\keywords}[1]
 {
   \small	
@@ -18,16 +18,16 @@
 \title{Automatic Extraction of Materials and Properties from Superconductors Scientific Literature}
 \author[1]{Luca Foppiano}
 \author[2]{Pedro Baptista de Castro}
-\author[3]{Pedro Ortiz}
-\author[4]{Laurent Romary}
+\author[3]{Pedro Ortiz Suarez}
+% \author[4]{Laurent Romary}
 \author[2]{Kensei Terashima}
 \author[2]{Yoshihiko Takano}
 \author[1]{Masashi Ishii}
 
 \affil[1]{Material Database Group, MaDIS, NIMS, Tsukuba, Japan}
 \affil[2]{Nano Frontier Superconducting Materials Group, MANA, NIMS, Tsukuba, Japan}
-\affil[3]{Data and Web Science Group, University of Mannheim, Germany}
-\affil[4]{ALMAnaCH, Inria, Paris, France}
+\affil[3]{Data and Web Science Group, University of Mannheim, Mannheim, Germany}
+% \affil[4]{ALMAnaCH, Inria, Paris, France}
 
 \begin{document}
 
@@ -37,7 +37,7 @@
 The automatic extraction of materials and related properties from the scientific literature is getting more attention in data-driven materials science (Materials Informatics). 
 We present our system for automatically extract superconductor material names and respective properties from PDF documents.
 Our system combines Machine Learning and Heuristic approaches using a flexible architecture: developers can plug-in various Named Entities Recognition (NER) methods (CRF, BidLSTM, Transformers) or relation extraction approaches (ruled-based, CRF).
-We have processed X papers and extracted Y materials and properties: superconducting critical temperature, crystal structure and, when available, applied pressure and measurement method.
+We have processed 37700 papers and extracted 40324 materials and properties including T\textsubscript{c} superconducting critical temperature and, when available, applied pressure and T\textsubscript{c} measurement method.
 The data obtained is suitable as input in newly material discovery projects and is available in machine-readable format.
 \end{abstract}
 
@@ -45,24 +45,28 @@ The data obtained is suitable as input in newly material discovery projects and 
 
 \section{Introduction}
 % 1. Start about SC, introduce few applications (Stanev), most of SC of discovery by "feeling" or "serendipidity"
-The research of new superconducting materials is still an hot topic in both fundamental science and practical applications.
-Superconductors display many interesting quantum phenomena including persistent electrical currents, zero-resistivity, ability to host a strong magnetic field, vortex pinning, and quantisation of the magnetic flux. [add references]
-Moreover, there is a growing list of practical and theoretical applications of superconductors including medical instruments (MRI/MNR), high-speed trains, quantum computers, and components of particles accelerators, such as the Linear Hadron Collider (LHC)~\cite{PhilippeBook, Kizu2010ConstructionOT, Cardani2017NewAO}.
-However, discovering a new superconductor is still a challenging task~\cite{PhysRevB.103.014509, doi:10.1088/1468-6996/16/3/033503} because the phenomena is not yet fully understood and the relation between superconductivity and chemical composition remains unclear. 
-Most of the superconductors materials have been discovered using the "feeling" (or "serendipity") approach following researchers intuition rather than any particular methodology.~\cite{doi:10.1080/08957959.2019.1695253}
+%The research of new superconducting materials is still an hot topic in both fundamental science and practical applications.
+%Superconductors display many interesting quantum phenomena including persistent electrical currents, zero-resistivity, ability to host a strong magnetic field, vortex pinning, and quantisation of the magnetic flux. [add references]
+%Moreover, there is a growing list of practical and theoretical applications of superconductors including medical instruments (MRI/MNR), high-speed trains, quantum computers, and components of particles accelerators, such as the Linear Hadron Collider (LHC)~\cite{PhilippeBook, Kizu2010ConstructionOT, Cardani2017NewAO}.
+%However, discovering a new superconductor is still a challenging task~\cite{PhysRevB.103.014509, doi:10.1088/1468-6996/16/3/033503} because the phenomena is not yet fully understood and the relation between superconductivity and chemical composition remains unclear. 
+%Most of the superconductors materials have been discovered using the "feeling" (or "serendipity") approach following researchers intuition rather than any particular methodology.~\cite{doi:10.1080/08957959.2019.1695253}
 
 % 2. Use of data-driven approaches is becoming more popular and fundamental for material discovery (there are many reviews - example citations data from Pedro) 
 % ~\cite{stanev_machine_2017, le2020critical,Hamlin2019SuperconductivityNR}.(Superdocutivity releated citations)
 
 % Pedro
-In the recent years, with the creation of computational databases, such as the Materials Project (MP)~\cite{materialsprojectJain2013}, the Open Quantum Materials Database (OQMD)~\cite{oqmdkirklin2015open}, and then experimental data repositories such as NIMS MDR (\url{http://mdr.nims.go.jp})~\cite{ranganathan_anusha_2019_3553963}, the focus has been steadily shifting towards a data-driven design of materials. In this new paradigm, the efficient use of data to guide experiments and materials property prediction through use of machine learning methods takes the centre stage. 
-For example, data-driven methods have been used to search/design magneto-caloric materials~\cite{Bocarsly2017,Castro2020,court2021inverse}, photo-catalysts for hydrogen splitting~\cite{xiong2021optimizing}, thermoeletrics~\cite{iwasaki2019machine}. 
-Furthermore, the advance of natural language processing methods for data extraction of scientific literature, also plays a key role in supporting this new paradigm. 
-For example, \cite{court2018auto} developed a semi-automatic system to build a dataset of magnetic materials with their Néel and Curie temperatures.  
-Other work from the same authors attempted to build a model for predicting properties, e.g. magnetic and superconducting critical temperature~\cite{court_magnetic_2020}. In the specific case of superconductivity, most of data-driven works relies on a single database: SuperCon\cite{stanev_machine_2017, le2020critical,Hamlin2019SuperconductivityNR}.
+In recent years, with the creation of computational databases, such as the Materials Project (MP)~\cite{materialsprojectJain2013}, the Open Quantum Materials Database (OQMD)~\cite{oqmdkirklin2015open}, and then experimental data repositories such as NIMS MDR (\url{http://mdr.nims.go.jp})~\cite{ranganathan_anusha_2019_3553963}, the focus has been steadily shifting towards a data-driven design of materials which is often called as Materials Informatics (MI). 
+Such an approach is expected to accelerate exploration of functional materials, as it does not rely on intuition of very little genius researchers nor on their limited experience.
+In this new paradigm, the efficient use of data to guide experiments and materials property prediction through use of machine learning methods takes the centre stage. 
+For example, data-driven methods have been used to search/design magneto-caloric materials~\cite{Bocarsly2017,Castro2020,court2021inverse}, photo-catalysts for hydrogen splitting~\cite{xiong2021optimizing}, thermoeletrics~\cite{iwasaki2019machine}, and superconductors~\cite{stanev_machine_2017}. 
+In such a data-driven search, one of the most important keys lies at the availability of the data, that at least should consist both compositions of materials and their physical properties. 
+For instance, in the specific case of superconductivity, most of the data-driven works~\cite{stanev_machine_2017, le2020critical,Hamlin2019SuperconductivityNR} relies on a single database: SuperCon (\url{http://supercon.nims.go.jp}). SuperCon is a structured database of superconductors materials and their properties, developed at the National Institute for Materials Science (NIMS) in Japan. 
 
-In more details, SuperCon (\url{http://supercon.nims.go.jp}) is a structured database of superconductors materials and their properties, developed at the National Institute for Materials Science (NIMS) in Japan. 
-At the time of writing this paper, SuperCon contains about 33000 inorganic and 600 organic materials and is the "de-facto" standard in data-driven research for superconductors materials: about 4400 articles contains the mention "\textit{supercon database}" in Google scholar. 
+%Furthermore, the advance of natural language processing methods for data extraction of scientific literature, also plays a key role in supporting this new paradigm. 
+%For example, \cite{court2018auto} developed a semi-automatic system to build a dataset of magnetic materials with their Néel and Curie temperatures.  
+%Other work from the same authors attempted to build a model for predicting properties, e.g. magnetic and superconducting critical temperature~\cite{court_magnetic_2020}. In the specific case of superconductivity, most of data-driven works relies on a single database: SuperCon\cite{stanev_machine_2017, le2020critical,Hamlin2019SuperconductivityNR}.
+
+At the time of writing this paper, SuperCon contains about 33000 inorganic and 600 organic materials and is the "de-facto" standard in data-driven research for superconductors materials: about 4400 articles contains the mention "\textit{supercon database}" in Google Scholar. 
 % One of the main problem with predicting T\textsuperscript{c} is to make reliable models which consider also non-superconducting materials or failed experiment to provide the model with the largest amount of information. Unfortunately, this is not often the case because failures and negative results are usually not reported in scientific papers.
 % % I will handle this (PC) up ffrom there to line 41.
 
@@ -74,48 +78,48 @@ At the time of writing this paper, SuperCon contains about 33000 inorganic and 6
 % 4. Problems of supercon
 % What are the current limits of SuperCon 1 from external users: data is fully manually inserted, no structure, the database contains more then 100 fields that were introduced freely 
 % I want to say that the fact that supercon was built manually provided access to data in each part of the paper without limitation. While an automatic system would require different approeaches for plot/figures, tables and text. 
+However, SuperCon holds several issues to be improved: (i) sustainability. 
 SuperCon is manually curated with an average update rate of 6-10 articles (corresponding to 25-30 records) every 3 months\footnote{Obtained from \url{https://dice.nims.go.jp} news feed of "2021.12.08" and "2021.09.06".}. 
 The slow process makes difficult to incorporate the information from new publications in a timely manner.
 %In addition, such process does not guarantee 100 percent correctness: invalid formulas, typing mistakes are known by people that have worked with the data. Unfortunately the lack of feedback system did not help to improve the quality collectively. 
 %For example [PC can give me some examples]
-
-From architecture prospective SuperCon employ the same design from more than 20 years ago. The schema has not changed since then and was designed to be flexible with a key-value approach where additional properties could be introduced and collected by curators.
-% Since the research focus can shift back and forth on different aspects and properties of materials (e.g. results under applied pressure, measurement of critical current, study of specific phenomena) the underlying schema could accommodate such changes. 
-Today, SuperCon contains as much as 175 properties but it lacks important information like the "applied pressure" (pressure applied to obtain superconductivity), which is relevant for researchers because it can change radically the nature of a material. 
-% Unfortunately, SuperCon does not contain such property systematically. 
-SuperCon also lacks the "measurement method" (the method used to measure the T\textsubscript{c}) for a) characterise multiple T\textsubscript{c} obtained from the same material and, b) allow to distinguish calculated and experimental superconductors critical temperatures. 
+(ii) Data structure. From architecture prospective SuperCon uses a flexible key-value design allowing curators to introduce properties at ease. 
+As a result, today SuperCon contains as much as 175 properties but still it lacks important information like "pressure" applied to obtain superconductivity, which is relevant for researchers because it can change radically the nature of a material. 
+SuperCon also lacks a consistent structured description of the "method" used to measure the superconducting transition temperature T\textsubscript{c}. Such information is randomly spread in different properties, such as 'commnt', 'mdebye' probably depending on the curator. 
+Such property is necessary to characterise multiple T\textsubscript{c}s obtained from the same material and distinguish calculated and experimental T\textsubscript{c}. 
 
 % 5. What are the needs? Need for a tool of methods allowing automatic extraction (both approach: general for materials or SuperCon)
-In summary, there is a strong need for a tool to produce a large structured database of superconductors materials in a sustainable way. 
-Ideally, our goal is to have a single tool that can be customised with ease to work in several domains. Nevertheless, at this stage, we focus only on superconductors materials research. 
+% In summary, SuperCon needs to be modernised to support more data structures and to cope with the growing publications. 
+%Ideally, our goal is to have a single tool that can be customised with ease to work in several domains. Nevertheless, at this stage, we focus only on superconductors materials research. 
+As a solution, we are seeking for methods for automation, and focused on text data mining approach on scientific literature.
+Recently we have built SuperMat~\cite{foppiano2021supermat}: a dataset of linked annotated data of full-text articles from scientific literature on superconductors research. We created SuperMat as a resource that can be used for training ML models or evaluate NLP techniques.
 
 % 6. in this work we present X, where we did Y and obtain Z
-In this work, we present \textit{grobid-superconductors}: a system for automatically build a structured database of superconductors materials and properties from scientific literature. 
-The tool is a module based on grobid~\cite{GROBID}, a machine learning library to parse and structure scientific documents. Grobid provides native support for PDFs documents, a diverse set of ML architectures (Conditional Random Field (CRF), Recurrent Neural Networks (RNN) based on bidirectional LSTM, and transformers such as BERT\cite{devlin2018bert} or SciBERT~\cite{Beltagy2019SciBERT}. 
-We developed \textit{grobid-superconductors} and we trained it on SuperMat~\cite{foppiano2021supermat}, a corpus of annotated linked data of full-text articles from superconductor research.
+In this work, we present \textit{grobid-superconductors}: a system to extract automatically structured information of superconductors materials and properties from scientific literature. 
+The tool is a specialised module of Grobid~\cite{GROBID}, a machine learning library to parse and structure scientific documents. 
+Grobid provides native support for PDFs documents, a diverse set of ML architectures (for example Conditional Random Field (CRF), Recurrent Neural Networks (RNN) based on bidirectional LSTM, and transformers such as BERT~\cite{devlin2018bert} or SciBERT~\cite{Beltagy2019SciBERT}).
 
 % 7. what is our purpose? 
-We established a process for creating structured databases on large quantity of documents starting from superconductors materials and properties. 
-We create a database of 40324 records by processing 37770 superconductors research papers from ArXiv\footnote{\url{https://arxiv.org}} belonging to the category \textit{cond-mat.supr-cond}. We named this new database SuperCon\textsubscript{2} as the evolution of SuperCon, containing 2052 pair material-Tc including applied pressure and 3602 records containing an explicit measurement method for the measured T\textsubscript{c}.
-Furthermore, we exploit the native information from PDF document provided by Grobid to construct a workflow interface for rapid database curation. 
+Using grobid-superconductors and other tools, we established a workflow for processing large quantity of documents and obtaining an automated database of superconductors materials and properties. 
+We processed 37770 papers from ArXiv\footnote{\url{https://arxiv.org}} and obtained a database of 40324 records. We named this new database SuperCon\textsubscript{2} as the successor of SuperCon.
+%Furthermore, we exploit the native information from PDF document provided by Grobid to construct a curation interface for data quality enhancement. 
 
 
 \section{Grobid-superconductors}
 
 % Overview from the other paper, what are the differences and some repetition on the previous paper 
-\textit{Grobid-superconductor} is the extraction system that allow the process of text or PDF documents to extract materials and corresponding properties. 
-We develop \textit{grobid-superconductors} as a multi-steps tool based on the \textit{Grobid} library~\cite{GROBID} following some principles previously discussed in a preliminary study~\cite{foppiano:hal-02870896}.  
+\textit{Grobid-superconductor} is an extraction system that allow the processing of text or PDF documents to extract materials and corresponding properties. 
+We develop \textit{grobid-superconductors} as a multi-steps tool based on the \textit{Grobid} library~\cite{GROBID} following some principles discussed in a previous preliminary study~\cite{foppiano:hal-02870896}.  
 The choice to develop it as a \textit{Grobid} module bring several advantages: a) It integrates with \textit{pdfalto}\footnote{\url{https://github.com/kermitt2/pdfalto}}, a specialised tool for PDF parsing which mitigate extraction issues such as the resolution of embedded fonts, invalid character encoding, and the reconstruction of the correct reading order. 
 Secondly, b) it allows to access to low level layout PDF information for both machine learning and document decoration and, finally, c) it provides access to a set of high-quality, pre-trained machine learning models for structuring documents.
 
 % Abstract vs fulltext
 The scope of \textit{grobid-superconductors} is to process the full-text of scientific articles. Figures and tables body, requiring a specific process, are ignored.
 At the time of writing this paper, we are aware of several related work applying machine learning on material data science that are developed with limitation of  only abstract text.
-The main reason is that abstracts are usually freely available, are easier to obtain~\cite{kononova_text-mined_2019}, and contain more condensed information~\cite{yamaguchi-etal-2020-sc, court_magnetic_2020}. 
+The main reason is that abstracts are usually freely available, are easier to obtain~\cite{kononova_text-mined_2019}, and contain condensed information~\cite{yamaguchi-etal-2020-sc, court_magnetic_2020}. 
 However, although working with full-text poses more challenges, it gives access to a wider spectrum of information such as background information (e.g. behaviour with under or over-doping) related to the studied materials. Even more important full-text might contains negative results (e.g. absence of superconductivity for certain samples) which are rarely discussed in the abstract. 
 Such examples are needed to supply knowledge of non-superconductivity when building a superconductors prediction model~\cite{stanev_machine_2017}. 
-
-\textit{Grobid-superconductors} provides a web API we use to integrat the extraction in an ingestion workflow (Section~\ref{sec:ingestion-workflow}) that supply PDF documents and store the resulting information in a database.
+\textit{Grobid-superconductors} provides a Web REST API which can be used to set-up a large scale processing unit integrated with a decoupled ingestion workflow (Section~\ref{subsec:ingestion-workflow}).
 
 % what makes us different from previous work 
 % Grobid-superconductors supports PDFs documents natively. This means that a) the system as access to additional layout information such as superscript, subscript, bold, italic, font name, font size which can be exploited for improved accuracy. And, b) we collect the coordinates in the document of any information that is extracted from PDF document.
@@ -139,6 +143,7 @@ Such examples are needed to supply knowledge of non-superconductivity when build
 \end{figure}
 
 \subsubsection{Document structuring and pre-processing}
+\label{subsubsec:document-structuring}
 The Document structuring and pre-processing component processes the PDF document into a internal model structured as a list of text sentences.
 
 % Internal process
@@ -166,26 +171,31 @@ During the \textit{Document structuring and pre-processing}, the process extract
 The following step of Extraction and Linking are enriching the internal structure by attaching additional structured information. 
 
 \subsubsection{Extraction}
+\label{subsubsec:extraction}
 
 The second step in the architecture is the \textit{Extraction}, a named entities recognition (NER) task.
-We designed this component as aggregation of multiple parsers with a final post-processing. Each parser focuses on specific extractions and combining multiple machine learning models and rule-based algorithms.
-The machine learning models can be trained using multiple architectures thanks to the integration between Grobid and the DeLFT (Deep Learning For Text) library~\cite{DeLFT}. 
-The rule-based parsers are implemented using SpaCy (\url{https://spacy.io} entity ruler.
+We designed this component as aggregation of multiple "parsers" applied in sequence to the data structure ending with a final post-processing which perform cleanup and operation at document level. 
+Each parser focuses on specific extractions and combining multiple machine learning (ML) models and rule-based (RB) algorithms.
+The RB algorithms are implemented using SpaCy (\url{https://spacy.io} component called "entity ruler".
+The ML models are available with multiple architectures thanks to the integration between Grobid, Wapiti for CRF and the DeLFT (Deep Learning For Text) library~\cite{DeLFT} for the deep learning models. 
+
 
 \begin{figure}[ht]
-\label{fig:extraction-ml-models-cascade-architecture}
 \includegraphics[width=\textwidth]{extraction-schema-2}
-\caption{Cascade architecture combining the superconductors and material parsers.}
+\caption{\label{fig:extraction-ml-models-cascade-architecture} Cascade architecture combining the superconductors and material parsers.}
 \end{figure}
 
 Figure~\ref{fig:extraction-ml-models-cascade-architecture} illustrates the data flow with the interaction between parsers and the extracted entity types. 
 
-\paragraph{Superconductors parser} combines two ML models (\textit{superconductors ML model} and \textit{quantities ML model}) and two RB extractors (\textit{crystal structures entity ruler} and \textit{space groups entity ruler}). 
-The \textit{superconductors ML model} is trained trained using SuperMat~\cite{foppiano2021supermat} (Table~\ref{tab:evaluation-10fold-superconductors-parser}) and aims to extract the main entities from the superconductors domain.
-We provide models trained using Conditional Random Field (CRF), Recurrent Neural Networks (RNN) using Bidirectional LSTM with CRF (BidLSTM\_CRF~\cite{Lample2016NeuralAF}), and Transformers (SciBERT~\cite{Beltagy2019SciBERT}).
+\paragraph{Superconductors parser}
+Combines two ML models: \textit{superconductors} ML model and \textit{quantities} ML model.
+%Combines two ML models (\textit{superconductors} ML model and \textit{quantities} ML model) and two RB extractors (\textit{crystal structures type} entity ruler and \textit{space groups} entity ruler). 
+The \textit{superconductors} model is trained trained using SuperMat~\cite{foppiano2021supermat} and aims to extract the main entities from the superconductors domain (evaluation in Table~\ref{tab:evaluation-10fold-superconductors-parser}).
+We provide models trained using Conditional Random Field (CRF), Recurrent Neural Networks (RNN) using Bidirectional LSTM with CRF~\cite{Lample2016NeuralAF}, and Transformers (SciBERT~\cite{Beltagy2019SciBERT}).
 The \textit{quantities ML model} is a model specialised in extracting quantities of measurements from the \textit{grobid-quantities}~\cite{foppiano2019quantities} project and trained on scientific text.
-We filter entities extracted by the \textit{quantities ML model} to retain only temperatures and pressures and we merge them with the entities extracted by the \textit{superconductors ML model} to remove duplicates or keep the largest matches.
-Finally, the rule-based components are extracting the crystal structures, the space groups and the unit cells. We use rule based because the number of items is finite with lower variation.  
+We filter entities extracted by the \textit{quantities} model to retain only temperatures and pressures and we merge them with the entities extracted by the \textit{superconductors ML model} to remove duplicates or keep the largest matches.
+%Finally, the rule-based components are extracting the structural information such as the crystal structure type (e.g NaCl-type), the space groups and the unit cell type. 
+%We use rule based because the number of items is finite with lower variation.  
 The extracted entities are summarised in Table~\ref{tab:superconductors-parser-entities}. More details about the definition of the machine learning entities can be obtained in the work on SuperMat~\cite{foppiano2021supermat}.
 
 \begin{table}[ht]
@@ -205,17 +215,17 @@ T\textit{c} expressions (\texttt{<tc>}) & Expressions in the text that provide i
 Measurement methods (\texttt{<me\_method>}) & Techniques used to measure or calculate the presence of superconductivity. \\
 Applied pressure (\texttt{<pressure>}) & Applied pressure when superconductivity is recorded\\
 \hline
-\hline
-\multicolumn{2}{c}{\textbf{Rule-based}} \\
-\hline
-Crystal structure (\texttt{<crystal-structure>}) & Geometry of arrangement of particles in the unit cell\\
-Space groups  (\texttt{<space-group>}) & Symmetry group, usually in three dimensions\\
-Unit cells (\texttt{<unit-cells>}) & A repeating unit formed by the vectors spanning the points of a lattice\\
-\hline
+% \hline
+% \multicolumn{2}{c}{\textbf{Rule-based}} \\
+% \hline
+% Crystal structure type (\texttt{<crystal-structure>}) & Geometry of arrangement of particles in the unit cell\\
+% Space groups (\texttt{<space-group>}) & Symmetry group, usually in three dimensions\\
+% Unit cells type (\texttt{<unit-cells>}) & A repeating unit formed by the vectors spanning the points of a lattice\\
+% \hline
 \end{tabular}
 }
-\label{tab:superconductors-parser-entities}
 \caption{Synthesis of the superconductors parser entities. }
+\label{tab:superconductors-parser-entities}
 \end{table}
 
 \paragraph{Material parser} is used to further structure the \texttt{<material>} entities from the \textit{Superconductors parser}. 
@@ -225,9 +235,9 @@ We provide models trained using CRF and RNN.
 %Since the performances with CRF or RNN are above 90\%, we do not supply the model based on transformers for this task. 
 Then, we apply several processing based on which information are available: 
 \begin{itemize}
-    \item we decompose the formula into a structured composition and we identify each group of compounds and values using a combination between mat2chem~\cite{kononova_text-mined_2019} and Pymatgen~\cite{Ong2013}, 
+    \item we decompose the formula into a structured composition and we identify each group of element-stoichiometry (e.g "O": 7.0) using a combination between mat2chem~\cite{kononova_text-mined_2019} and Pymatgen~\cite{Ong2013}, 
     \item we obtain the formula corresponding to the material name, if the name available and the formula is not (e.g. hydrogen to \textit{H}), 
-    \item we calculate the classes from the formula composition, using a simple algorithm we have designed which can return values such as Cuprate, Oxides, Alloys 
+    \item we calculate the classes from the formula composition, using a simple algorithm we have designed which can return values such as Cuprate, Oxides, Alloys, etc.
     \item using the extracted variables and values we apply permutation to the stochiometric formula to resolve the substitutions. For example the stochiometric formula \texttt{La 4 Fe 2 A 1-x O 7 (A=Mg,Co; x=0.1,0.2)} will permute the values of A and x to obtain \texttt{La 4 Fe 2 Mg 0.9 O 7}, \texttt{La 4 Fe 2 Mg 0.8 O 7}, \texttt{La 4 Fe 2 Co 0.9 O 7}, \texttt{La 4 Fe 2 Co 0.8 O 7}.
 \end{itemize}
 
@@ -240,8 +250,8 @@ Then, we apply several processing based on which information are available:
 \hline
 Name (\texttt{<name>}) & The canonical name of a material (e.g. Hydrogen, PCCO, Carbon) \\
 Formula (\texttt{<formula>}) & Chemical formula of the material (e.g. \texttt{Pr1.869Ce0.131CuO 4-}, \texttt{MgB2}, \texttt{La 2-x Sr x CuO 4}) \\
-Doping (\texttt{<doping>})& Doping ratio and doping materials that are adjointed to the material name (e.g. \\
-Shape (\texttt{<shape>}) & shape of the material (e.g. single crystal, polycrystaline, thin film, powder, film) \\
+Doping (\texttt{<doping>})& Doping ratio and doping materials that are adjoined to the material name (e.g. \texttt{Zn-doped}, \texttt{2\% Zn-doped})\\
+Shape (\texttt{<shape>}) & shape of the material (e.g. single crystal, polycrystalline, thin film, powder, film) \\
 Substitution variables (\texttt{<variable>}) & Variables that can be substituted in the formula. \\
 Substitution values (\texttt{<value>}) & Values expressed in the stoichiometric doping. \\
 Substrate (\texttt{<substrate>}) & Substrates as defined in the material name \\
@@ -249,14 +259,14 @@ Fabrication (\texttt{<fabrication>}) & Represent eventual additional information
 \hline
 \end{tabular}
 }
-\label{tab:material-parser-entities}
-\caption{Synthesis of the material parser entities. }
+\caption{\label{tab:material-parser-entities} Synthesis of the material parser entities. }
 \end{table}
 
-\paragraph{Post-processing} The post-processing is the final step of the extraction and has the objective of running aggregations at document level. We utilise the decomposed formulas to aggregate the mention in the document that is referring to the same material. 
+\paragraph{Post-processing} The post-processing is the final step of the extraction and has the objective of running aggregations at document level. 
+We utilise the decomposed formulas to aggregate the mention in the document that is referring to the same material. 
 For example we could aggregate simple cases such as \texttt{hydrogen} and \texttt{H} but also a complex stochiometric formula (e.g. \texttt{La 2 Fe 1-x O 7 (x = 0.1, 0.2)} with formulas discussed further in the paper. 
 
-\paragraph{Discussion on machine learning evaluation}
+\paragraph{Evaluation}
 
 In this section we discuss the machine learning evaluation scores for the superconductors and materials ML models. The evaluation was performed using the 10-fold cross validation to obtain precision, recall and f1 score. The overall scores were calculated using the micro average which compensate the different balance of entities annotations. 
 
@@ -284,8 +294,7 @@ All (micro avg) & 82.43 & 79.68 & 81.03 & \textbf{83.01} & 82.89 & 82.95 & 83.01
 \hline
 \end{tabular}
 }
-\caption{Evaluation scores for the superconductor models using 10-fold cross-validation. }
-\label{tab:evaluation-10fold-superconductors-parser}
+\caption{\label{tab:evaluation-10fold-superconductors-parser} Evaluation scores for the superconductor models using 10-fold cross-validation. }
 \end{table}
 
 The material parser is provided in two architectures: CRF and BidLSTM+CRF because the performances are above 95\% and the SciBERT approach is very slow. 
@@ -310,8 +319,7 @@ Surprisingly, this model performs better using the CRF than the RNN. We notice t
 all  (micro avg)       & 96.87   & 96.51    & 96.68  & 95.75 &   96.44  &  96.09  \\
 \hline
 \end{tabular}
-\caption{Evaluation scores of 10-fold cross-validation of the material parser. }
-\label{tab:evaluation-10fold-material-parser}
+\caption{\label{tab:evaluation-10fold-material-parser} Evaluation scores of 10-fold cross-validation of the material parser. }
 \end{table}
 
 
@@ -323,13 +331,22 @@ The Linking is the final step of the processing that aims to link together entit
 We can formalised it as follows. \textit{Given a text T and two or more entities e\textsubscript{1}...e\textsubscript{n} of two types t\textsubscript{1} and t\textsubscript{2}, determine links between entities of type t\textsubscript{1} can be linked to entities of type t\textsubscript{2} .} 
 
 %We have experimented several options: dependency parsing, rule-based, and sequence labelling. 
-Our implementation uses a main rule-based method and a secondary approach based on sequence labelling. The dependency parsing was studied using several approaches from scientific literature~\cite{yoshikawa:2017acl, Tiktinsky2020pyBARTES, swayamdipta:17, zhou-zhao-2019-head} and it was discarded because a) it is challenging to find parser performing well on scientific text, and, by consequence, b) our implementation was converging toward a complex set of rules to compensate for the poor performances of the dependency parser.
+Our implementation uses a main rule-based method and a secondary approach based on sequence labelling. Other approaches, such as the user of dependency parsing based on different proposed methods~\cite{yoshikawa:2017acl, Tiktinsky2020pyBARTES, swayamdipta:17, zhou-zhao-2019-head} were studied and discarded because a) challenging to find a dependency parser performing well on scientific text, and, by consequence, b) we realised that the implementation of methods was converging toward a complex set of rules to compensate for the poor performances obtained by the parser.
+
+In our implementation we focus on three types of relationships: 
+\begin{itemize}
+    \item \textbf{material-tcValue} links a material with its corresponding superconducting critical temperature value, 
+    \item \textbf{tcValue-pressure} connects a superconducting critical temperature value with its related critical pressure, and 
+    \item \textbf{me\_method-tcValue} connects the superconducting critical temperature value to its corresponding measurement method.
+    % \item \textbf{material-crystal\_structure} link the material with their crystal structure, and 
+    % \item \textbf{material-space\_group} to link the material to their space groups.
+\end{itemize}
 
 % Algorithm in brief (three or four different scenario): 
 \paragraph{T\textsubscript{c} classification}
-For linking the T\textsubscript{c} to any other entity type, there is an classification engine for deciding whether the temperature entity is  "a superconducting critical temperature" or not. 
+For linking the T\textsubscript{c} to any other entity type, there is a classification engine for deciding whether the temperature entity is  "a superconducting critical temperature" or not. 
 The classification is rule-based and combines the extracted entities of T\textsubscript{c} expressions (label \texttt{<tc>}) with a set of predefined standard names. 
-If a T\textsubscript{c} is not considered a "superconducting critical temperature" is excluded from the list of possible linking candidates. 
+When a T\textsubscript{c} is not considered a "superconducting critical temperature" it is excluded from the list of possible linking candidates. 
 
 \paragraph{Rule-based linking}
 The rule-based approach works with two main scenarios: a) if entities to be linked have cardinality one in the sentence, they are linked automatically, and b) when their cardinality is higher then they are linked "by distance" or "in order", depending on the structure of the sentence. 
@@ -339,9 +356,9 @@ For example, the sentence:
 P-or Ba-122  and Co-doped Ba-122 have lower T c s of about 30 K and 24 K, respectively, which makes helium free operation questionable.
 \end{displayquote}
 containing the word "respectively" and therefore is processed by linking the materials in order: \textit{P-or Ba122} is assigned to \textit{30 K} and \textit{Co-doped Ba-122} to \textit{24 K}.
-The "in order" method is very sensible to missing entities, for example if one entity is not extracted by mistake it will rick to incorrectly assign all the entities in the block. To avoid this, if the entities are unbalanced we reduce the search space as follows: 
+The "in order" method is very sensible to missing entities, for example if one entity is not extracted by mistake it will lead to incorrectly assign all the entities in the block. To avoid this, if the entities are unbalanced we reduce the search space as follows: 
 \begin{itemize}
-    \item m entities of type\textsubscript{1} vs n entities of type\textsubscript{2} with $m > n$: we shift the starting point to start at the second entity 
+    \item m entities of type\textsubscript{1} vs n entities of type\textsubscript{2} with $m > n$: we shift the starting point to start at the $m - $n entity 
     \item m entities of type\textsubscript{1} vs n entities of type\textsubscript{2} with $m < n$: we shift the ending point at the n\textsubscript{-1} entity
 \end{itemize}
 With this sentence structure we know that the entities are in order, however if one is missing we just ignore the entities in surplus without disrupting the assignment. 
@@ -350,92 +367,210 @@ We define the distance measurement \textit{d} as a value calculated in numbers o
 If the entity is surrounded by parenthesis we expand it to the whole parenthesis and centre is shifted and all its content refers to the same entity. 
 As an example, in the sentence
 \begin{displayquote}
-We tested two materials MgB2 (Tc = 39K) and LaFe (Tc = 16K).
+We tested two materials MgB2 (Tc = 39 K) and FeSe (Tc = 16 K).
 \end{displayquote}
-both temperatures are expanded to their containing parenthesis e.g. \texttt{39K} to \texttt{(Tc = 39K)}, moving the centre toward the left. 
+both temperatures entities are expanded to their containing parenthesis e.g. \texttt{39 K} to \texttt{(Tc = 39 K)} in this case moving the centre, in this case the centre was shifted from 38 a 35 toward the left.
 As a result, the distance tend to be shorter to entities immediately closed to the whole parenthesis block and the impact of the dimension of the whole parenthesis block is reduced when calculating the distance (the entity could be on each side within the parenthesis). 
 
 The distance calculation is also adjusted with the addition of "penalties", that is, the distance is doubled when certain keywords such as "and", ", ", "." representing logical separation of predicates appear in the sentence. The rationale is that element between two separated predicates are likely not to be linked although they might be at a smaller distance. 
 
-\paragraph{Sequence labelling linking} We designed the linking based on sequence labelling as a simple task where each token has been assigned two possible labels: \texttt{<link\_left>} or \texttt{<link\_right>}. The post-processing decodes the labels and translated them into linking between entities. 
-This approach has a obvious limitation to linking subsequent entities.  
-
-\paragraph{Results} In our implementation we focus on three types of relationships: 
-\begin{itemize}
-    \item \textbf{material-tcValue} links a material with its corresponding superconducting critical temperature value, 
-    \item \textbf{tcValue-pressure} connects a superconducting critical temperature value with its related critical pressure, and 
-    \item \textbf{me\_method-tcValue} connects the superconducting critical temperature value to its corresponding measurement method.
-    % \item \textbf{material-crystal\_structure} link the material with their crystal structure, and 
-    % \item \textbf{material-space\_group} to link the material to their space groups.
-\end{itemize}
-
-\paragraph{Discussion on evaluation}
-The evaluation is shown in Table \ref{table:evaluation-linking}. 
-The rule-based was tested using the SuperMat~\cite{foppiano2021supermat} corpus which contains linked entities. Each test was framed to test the linking between two entities type. 
-The result of the \texttt{material-tcValue} obtained above 80\% F1 score with a precision of 88\%. We would like to stress we strive to obtain higher precision scores. 
-
-The approach with sequence labelling was less performant, with scores of 69.16\%, 69.76\%, and 44.65\% F1 score, respectively. In general, the effectiveness of this methodology is dubious, however the amount of training data that can be used is smaller than for NER. 
-This is the main cause of the lower score of \texttt{tcValue-me\_method}. 
-
+The rule-based linking is evaluated using the linked entities from SuperMat~\cite{foppiano2021supermat} (Table~\ref{table:evaluation-linking}). 
+Each task aims evaluating the linking between two entities types, assuming a 100\% accuracy in the Extraction step. 
+The result of the \texttt{material-tcValue} obtained above 80\% F1 score with a precision of 88\% which, in this task is the main objective.
 
 \begin{table}[ht]
 \centering
-\begin{tabular}{lccc}
-\hline \textbf{Linked entities} (Method) & \textbf{Precision} & \textbf{Recall} & \textbf{F1-score} \\ \hline
-\textbf{material-tcValue} (Rule-based)  & 88.00 	&   74.00      &	81.00      \\
-\textbf{material-tcValue} (CRF)         & 68.52 &	70.11   &  69.16    \\
-\textbf{tcValue-pressure} (CRF)         & 72.92 &	67.67   &  69.76    \\
-\textbf{tcValue-me\_method} (CRF)       & 49.99 &	45.21   &  44.65   \\
+\begin{tabular}{lcccc}
+\hline \textbf{Link type} (Method) & \textbf{Precision} & \textbf{Recall} & \textbf{F1-score} & Support (avg) \\ \hline
+\textbf{material-\tc} (RB)      &  88.40    & 74.52 &    80.87 &   726  \\
+\textbf{\tc-pressure} (RB)      & 85.71  &  71.52  &  77.98  &  118     \\
+\textbf{\tc-me.method} (RB)     & 62.28 & 65.74 &  63.96  &  151 \\
+% \textbf{material-\tc} (CRF)    & 68.52 &	70.11   &  69.16  &  \\
+% \textbf{\tc-pressure} (CRF)    & 72.92 &	67.67   &  69.76  &  \\
+% \textbf{\tc-me.method} (CRF)   & 49.99 &	45.21   &  44.65  & \\
 \hline
 \end{tabular}
-\label{table:evaluation-linking}
-\caption{Evaluation scores of the linking methods. }
+\caption{\label{table:evaluation-linking} Evaluation scores of the linking methods. }
 \end{table}
+
+\paragraph{Sequence labelling linking} We designed the linking based on sequence labelling as a simple task where each token can be assigned two labels: \texttt{<link\_left>} or \texttt{<link\_right>}. 
+Furthermore, a decoder processing the labelled sequence is assigning links to entities.
+We trained three models, one model for each link type (or entity class pair), using SuperMat~\cite{foppiano2021supermat}.
+The evaluation was performed using 10-fold cross-validation (Table~\ref{tab:evaluation-crf-linking-cross-validation}) with F1 score of 69.16\% for material-tcValue, 44.65\% for tcValue-pressure and 69.66\% for tcValue-me\_method. 
+
+[TODO: add evaluation considering pairs of right-left, which should be lower :-(]
+\begin{table}[ht]
+\centering
+% \scalebox{0.7}{
+\begin{tabular}{c c c c c}
+\hline 
+\textbf{label} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{Support}\\ 
+\hline
+\multicolumn{5}{c}{} \\
+\hline
+\multicolumn{5}{c}{\textbf{material-tcValue}} \\
+\hline
+\texttt{<link\_left>}  & 70.78   & 73.97 & 72.1  & 505    \\
+\texttt{<link\_right>} & 66.26   & 66.26 & 66.12 & 507    \\
+\hline
+all (micro avg.)       & 68.52   & 70.11 & 69.16 &       \\
+\multicolumn{5}{c}{} \\
+\hline
+\multicolumn{5}{c}{\textbf{tcValue-me\_method}} \\
+\hline
+\texttt{<link\_left>}  & 50.67   & 58.08 & 51.1  & 40    \\
+\texttt{<link\_right>} & 44.71   & 31.83 & 35.68 & 39    \\
+\hline
+all (micro avg.)       & 49.99   & 45.21 & 44.65 &       \\
+\multicolumn{5}{c}{} \\
+\hline
+\multicolumn{5}{c}{\textbf{tcValue-pressure}} \\
+\hline
+\texttt{<link\_left>}  & 76.48   & 67.78  & 70.66 & 113    \\
+\texttt{<link\_right>} & 71.02   & 67.57  & 68.89 & 117    \\
+\hline
+all (micro avg.)       & 72.92   & 67.67  & 69.76 &       \\
+\end{tabular}
+% }
+\caption{Evaluation of the CRF-based linking using 10-fold cross-validation for the three linking models. }
+\label{tab:evaluation-crf-linking-cross-validation}
+\end{table}
+
+This approach has a several limitations which impact effectiveness in training and tagging. 
+Firstly, since the sequence is flat, (a) it is limited to pairs of adjacent entities. Secondly, (b) the decoding of the annotated sequence is challenging and the linking will not be successful if the sequence of "right-left" labels goes out of sync e.g. if the model tags two subsequent entities with the same label one needs to be ignored. Finally, (c) this architecture limit the benefit of the training data, because it supports only certain type of sequences with adjacent entities. The model for tcValue-me\_method is particularly impacted by this limitation because the method of measurement is discussed often far from the actual results are illustrated. 
+[OPTIONAL TODO: add study on how we could create more training data, for example by duplicating the same sentence and picking up different entities]
+
 
 \subsection{End to end evaluation}
 
 % What is the end 2 end evaluation? 
-The end to end evaluation (e2e evaluation) measures the real capability from beginning to the end of the process. The evaluation of the different steps are useful but not sufficient to assess their quality. 
+The end to end evaluation (E2EE) measures the real capacity of the system from document to database.
+We limit the scope of the E2EE to the pair `material-Tc` and, when available, the triplet `material-Tc-pressure` which, at the moment, are the backbone on which the database is built upon.
+We perform the E2EE on a dataset composed by a previously selected set of 500 documents (500-papers) from three publishers: American Institute of Physics (AIP), American Physical Society (APS) and Institute of Physics (IOP)~\cite{foppiano2019proposal}.
+We manually examine and correct the resulting mini-database, marking records that are invalid. For each invalid record, we identify the cause from a predefined set of six error types in relation with the data-flow, as illustrated in Figure~\ref{fig:error-types}. 
 
-We perform e2e evaluation manually. First we process a dataset of 500 documents, then we select a representative amount. In Table~\ref{table:end2end-evaluation} we illustrate the results. 
+\begin{figure}[ht]
+\includegraphics[width=\textwidth]{e2e-error-types}
+\caption{Error types for the end to end evaluation described in the context of the data flow. }
+\label{fig:error-types}
+\end{figure}
 
-The F1-score is close to 70\% with precision at 73\% and recall at 66\%.
+The E2EE is summarised in Table~\ref{table:end2end-evaluation-summary}. 
+We present only precision because is the metric we want to maximise. Recall is omitted because less relevant and difficult to calculate manually. 
+We show the metrics by Title, Abstract, Paragraph, Figure caption, Unknown subsections and we provide average scores using micro-average. 
+The system scores 72.60\% considering all the subsections. 
+We notice there is a clear difference between error rates of Figure caption and unknown sections with the other subsections. 
+One solution to improve correctness, is to exclude text from certain subsections. 
+The scores increase to 73\% when excluding unknown sections, to 75.24\% when excluding figure captions, and 79.14\%  when both. 
+Both figure captions and unknown sections count for less then 20\% of the total number of sections. 
 
 \begin{table}[ht]
 \centering
-\begin{tabular}{lccc}
-\hline \textbf{Precision} & \textbf{Recall} & \textbf{F1-score} & \textbf{Support} \\ \hline
-73.86  &	66.33 &	69.90 & 597\\
+\begin{tabular}{l c c}
+\hline \textbf{Subsection} & \textbf{Precision} & \textbf{Support} \\ 
+\hline
+Title               & 100       & 2     \\
+Abstract            & 80.32     & 61    \\
+Paragraph           & 75.2      & 623   \\    
+Figure captions     & 59.28     & 140   \\    
+Unknown             & 57.14     & 21    \\
+\hline
+\hline
+\textbf{Micro avg.}  & 72.60     & 847   \\
+\textbf{Micro avg.} (excl. figures)  & 75.24     & 707   \\ 
+\textbf{Micro avg.} (excl. unknown sections)  & 73.00     & 603   \\ 
+\textbf{Micro avg.} (excl. figures and unknown sections)  & 79.14     & 657   \\ 
 \hline
 \end{tabular}
-\label{table:end2end-evaluation}
-\caption{End 2 end evaluation scores. }
+\caption{Evaluation end to end: summary of the scores. }
+\label{table:end2end-evaluation-summary}
 \end{table}
 
-Discussion of the results, which problems are currently emerging what are the prospective for the future?
+The error types are summarised in Figure~\ref{fig:error-types-distribution}. The most common failures are originated by Tc classification (40\%), Linking (32\%), and Extraction (20\%).
+The most commons Tc classification's failures are as incorrect recognition of: a) relative values of \tc, $\Delta$\tc, values indicating the transitional temperature width,  b) temperature values that are not \tc for example they are just temperatures T, T\textsubscript{Curie}, and c) values of temperature where there is absence of superconductivity.
+The errors of type Linking are divided mainly with a) when the authors are comparing relative values of Tc or absolute values of materials (e.g. \textit{The Tc = 12 K is similar to the one of Mg B2}), b) the material entity is not the subject of the \tc  in the sentence. 
+Finally, Extraction issues are mainly: a) the recognised entities does not represent a material but an annealing product, a machine, b) implicit mention of the main material when experimented with different substrates, and c) mismatches between material and class. 
+
+% \begin{table}[ht]
+% \centering
+% \begin{tabular}{lcc}
+% \hline \textbf{Error type} & \textbf{Rate} & \textbf{Support} \\ 
+% \hline
+% From table              & 2.58  & 6     \\
+% Extraction              & 20.25 & 47    \\
+% Quantities extraction   & 3.44  & 8     \\
+% Composition resolution  & 1.29  & 3     \\
+% Tc classification       & 40.08 & 93    \\
+% Linking                 & 31.89 & 74    \\
+% \hline
+% \hline
+% \textbf{Total}  & & 231   \\
+% \hline
+% \end{tabular}
+% \caption{Evaluation end to end: error types. }
+% \label{table:end2end-evaluation-errur types}
+% \end{table}
+
+\begin{figure}[ht]
+\includegraphics[width=\textwidth]{error-type-distribution-image}
+\caption{Error type distribution. }
+\label{fig:error-types-distribution}
+\end{figure}
+
 
 \section{Supercon\textsuperscript{2}}
 
-Introduction of the database, which data was extracted and the format 
+We created SuperCon\textsubscript{2} by processing 37770 research papers belonging to the category \textit{cond-mat.supr-cond} in ArXiv. Currently SuperCon\textsubscript{2} contains 40324 records including 2052 triplets \textit{material-Tc-applied pressure}, and 3602 records with explicit measurement method \textit{material-Tc-measurement method}.
+In addition, the schema contains additional information which are described in Table~\ref{tab:superconductors-parser-entities} and~\ref{tab:material-parser-entities} and richer bibliographic data described in Section~\ref{subsubsec:document-structuring}. 
 
 \subsection{Ingestion workflow}
 \label{subsec:ingestion-workflow}
 
+The ingestion workflow is performed with two processes (Figure~\ref{fig:ingestion-workflow}): "Extraction process" to transform the PDF documents to their JSON representation which follows the schema described in Section~\ref{subsubsec:document-structuring}, and "Aggregation process" to compress the document information in a synthesised table (CSV or TSV) format.
+We designed the ingestion workflow so that processes can run at the same time and allowing processing documents and records in parallel based on service capacity. 
+The workflow accesses \textit{grobid-superconductors} via asynchronous call to REST API allow decoupling between the workflow and the application and gives the flexibility to add more instances at ease.
+The workflow is orchestrated using a persistence layer implemented with MongoDB to store information and metadata such as error and failures.
+
 \begin{figure}[ht]
 \includegraphics[width=\textwidth]{workflow-schema-1}
 \caption{Schema of the ingestion workflow}
+\label{fig:ingestion-workflow}
 \end{figure}
 
-
-Quickly discussion on the ingestion workflow 
-
+The persistence layer is organised in four main collections: 1) binary collection containing the original PDF documents, 2) "document" collection with the JSON documents (the schema is described in Section~\ref{subsubsec:document-structuring}) obtained from the Extraction task, 3) "tabular" collection with the distilled record information, and 4) a logger collection with the status and error code for each processed document or record. 
 
 \subsection{User interface}
 \label{sucsec:supercon2-user-interface}
+SuperCon\textsubscript{2} can be utilised as text file (CSV or TSV) for processing and to build ML models and data-driven applications. 
+Although the automatic system might achieve good results and extract a large quantity of data, we are aware that some sort of "user validation" is required for improving the data quality. For this reason we have built SuperCon\textsubscript{2} with in mind the needs of an efficient curation interface. 
+Currently, the interface provides a) access and exploration of tabular data with navigation, filters, and exporting in various formats including CSV, TSV, Microsoft Excel (Figure~\ref{fig:interface-supercon2}), and b) visualisation of the PDF documents enhanced with the extracted information Figure~\ref{fig:pdf-annotations}). 
 
+\begin{figure}[ht]
+\includegraphics[width=\textwidth]{sample-database-interface}
+\caption{\label{fig:interface-supercon2} Example of SuperCon\textsubscript{2} database interface}
+\end{figure}
+
+The PDF visualisation allows the user to rapidly find the extracted entities and examine their content, for example, given a material, is possible to know to which properties it was linked. 
+Materials attributes (discussed in Section~\ref{subsubsec:extraction}) are visible in a box tha appear on the side of the document. 
+
+\begin{figure}[ht]
+\includegraphics[width=\textwidth]{sample-pdf-annotations}
+\caption{\label{fig:pdf-annotations} Example of superconductors research document~\cite{sample_superconductors_article} with enhanced annotations}
+\end{figure}
 
 \section{Conclusion}
 \label{sec:conclusion}
+In this work we present our solution for automatically creating a database of materials and properties from scientific literature. 
+We designed our solution into three components: a) \textit{grobid-superconductors}, a system that combines NER and EL for converting PDF documents into tabular data. b) an ingestion workflow which exploit the multiprocessing and client-server architecture to process large quantities of data and store it in a persistence layer. c) An interface which combine tabular navigation and native annotation on PDF documents to provide means for rapid data exploration. 
+Using our solution, we processed 37700 scientific articles and obtained SuperCon\textsubscript{2}, a database with 40324 records of superconductors materials and properties including the applied pressure and the T\textsubscript{c} measurement method which are currently not available in SuperCon. 
+SuperCon\textsubscript{2} is available in text format at \url{https://github.com/lfoppiano/supercon}.
+
+In future we will continue developing our applications by: a) extracting more properties such as crystal structure type, space groups type and lattice structure, b) studying supervised methodologies for the Linking step to replace the CRF implementation, and c) extend the interface to support more advanced and efficient curation.
+
+
+\section{Acknowledgement}
+\label{sec:acknowledgement}
+Our warmest thanks to Patrice Lopez, the author of Grobid (\url{https://github.com/kermitt2/grobid}), DeLFT (\url{https://github.com/kermitt2/delft}) and other interesting TDM open-source projects.
 
 \bibliography{bibliography}
 \bibliographystyle{plain}
