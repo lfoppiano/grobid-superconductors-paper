@@ -322,6 +322,7 @@
 
 @misc{GROBID,
   title         = {GROBID},
+  author        = {{GROBID contributors}},
   howpublished  = {\url{https://github.com/kermitt2/grobid}},
   publisher     = {GitHub},
   year          = {2008--2020},
@@ -739,13 +740,21 @@
   abstract  = {We introduce the third major release of WebAnno, a generic web-based annotation tool for distributed teams. New features in this release focus on semantic annotation tasks (e.g. semantic role labelling or event annotation) and allow the tight integration of semantic annotations with syntactic annotations. In particular, we introduce the concept of slot features, a novel constraint mechanism that allows modelling the interaction between semantic and syntactic annotations, as well as a new annotation user interface. The new features were developed and used in an annotation project for semantic roles on German texts. The paper briefly introduces this project and reports on experiences performing annotations with the new tool. On a comparative evaluation, our tool reaches significant speedups over WebAnno 2 for a semantic annotation task.}
 }
 
-
-@article{Lample2016NeuralAF,
-  title   = {Neural Architectures for Named Entity Recognition},
-  author  = {Guillaume Lample and Miguel Ballesteros and Sandeep Subramanian and K. Kawakami and Chris Dyer},
-  journal = {ArXiv},
-  year    = {2016},
-  volume  = {abs/1603.01360}
+@inproceedings{Lample2016NeuralAF,
+    title = "Neural Architectures for Named Entity Recognition",
+    author = "Lample, Guillaume  and
+      Ballesteros, Miguel  and
+      Subramanian, Sandeep  and
+      Kawakami, Kazuya  and
+      Dyer, Chris",
+    booktitle = "Proceedings of the 2016 Conference of the North {A}merican Chapter of the Association for Computational Linguistics: Human Language Technologies",
+    month = jun,
+    year = "2016",
+    address = "San Diego, California",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/N16-1030",
+    doi = "10.18653/v1/N16-1030",
+    pages = "260--270",
 }
 
 
@@ -4620,23 +4629,42 @@
     publisher = "Association for Computational Linguistics",
 }
 
-@article{devlin2018bert,
-  title={BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding},
-  author={Devlin, Jacob and Chang, Ming-Wei and Lee, Kenton and Toutanova, Kristina},
-  journal={arXiv preprint arXiv:1810.04805},
-  year={2018}
+@inproceedings{devlin2018bert,
+    title = "{BERT}: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+    author = "Devlin, Jacob  and
+      Chang, Ming-Wei  and
+      Lee, Kenton  and
+      Toutanova, Kristina",
+    booktitle = "Proceedings of the 2019 Conference of the North {A}merican Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers)",
+    month = jun,
+    year = "2019",
+    address = "Minneapolis, Minnesota",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/N19-1423",
+    doi = "10.18653/v1/N19-1423",
+    pages = "4171--4186",
+    abstract = "We introduce a new language representation model called BERT, which stands for Bidirectional Encoder Representations from Transformers. Unlike recent language representation models (Peters et al., 2018a; Radford et al., 2018), BERT is designed to pre-train deep bidirectional representations from unlabeled text by jointly conditioning on both left and right context in all layers. As a result, the pre-trained BERT model can be fine-tuned with just one additional output layer to create state-of-the-art models for a wide range of tasks, such as question answering and language inference, without substantial task-specific architecture modifications. BERT is conceptually simple and empirically powerful. It obtains new state-of-the-art results on eleven natural language processing tasks, including pushing the GLUE score to 80.5 (7.7 point absolute improvement), MultiNLI accuracy to 86.7{\%} (4.6{\%} absolute improvement), SQuAD v1.1 question answering Test F1 to 93.2 (1.5 point absolute improvement) and SQuAD v2.0 Test F1 to 83.1 (5.1 point absolute improvement).",
 }
 
 @inproceedings{Beltagy2019SciBERT,
-  title={SciBERT: Pretrained Language Model for Scientific Text},
-  author={Iz Beltagy and Kyle Lo and Arman Cohan},
-  year={2019},
-  booktitle={EMNLP},
-  Eprint={arXiv:1903.10676}
+    title = "{S}ci{BERT}: A Pretrained Language Model for Scientific Text",
+    author = "Beltagy, Iz  and
+      Lo, Kyle  and
+      Cohan, Arman",
+    booktitle = "Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP)",
+    month = nov,
+    year = "2019",
+    address = "Hong Kong, China",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/D19-1371",
+    doi = "10.18653/v1/D19-1371",
+    pages = "3615--3620",
+    abstract = "Obtaining large-scale annotated data for NLP tasks in the scientific domain is challenging and expensive. We release SciBERT, a pretrained language model based on BERT (Devlin et. al., 2018) to address the lack of high-quality, large-scale labeled scientific data. SciBERT leverages unsupervised pretraining on a large multi-domain corpus of scientific publications to improve performance on downstream scientific NLP tasks. We evaluate on a suite of tasks including sequence tagging, sentence classification and dependency parsing, with datasets from a variety of scientific domains. We demonstrate statistically significant improvements over BERT and achieve new state-of-the-art results on several of these tasks. The code and pretrained models are available at https://github.com/allenai/scibert/.",
 }
 
 @misc{DeLFT,
     title = {DeLFT},
+    author = {{DeLFT contributors}},
     howpublished = {\url{https://github.com/kermitt2/delft}},
     publisher = {GitHub},
     year = {2018--2022},
@@ -4663,4 +4691,33 @@ eprint = {
     
 }
 
+}
+
+
+@inproceedings{oka2021table,
+author = {Hiroyuki Oka and Atsushi Yoshizawa and Hiroyuki Shindo and Yuji Matsumoto and Masashi Ishii},
+title = {Automatic Extraction of Solvent-names on Polymer's Solubility from Academic Articles},
+booktitle = "The 66th JSAP Spring Meeting 2019",
+month = mar,
+year = "2019",
+address = "Tokyo, Japan",
+publisher = "Japan Society of Applied Physics",
+    
+}
+
+}
+
+
+@inproceedings{lavergne2010practical,
+    author    = {Lavergne, Thomas and Capp\'{e}, Olivier and Yvon,
+                 Fran\c{c}ois},
+    title     = {Practical Very Large Scale {CRFs}},
+    booktitle = {Proceedings the 48th Annual Meeting of the Association
+                 for Computational Linguistics ({ACL})},
+    month     = {July},
+    year      = {2010},
+    location  = {Uppsala, Sweden},
+    publisher = {Association for Computational Linguistics},
+    pages     = {504--513},
+    url       = {http://www.aclweb.org/anthology/P10-1052}
 }
