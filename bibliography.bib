@@ -331,6 +331,7 @@
 }
 
 @misc{biblio-glutton-lookup,
+  author       = {{Biblio Glutton Lookup contributors}},
   title        = {Biblio Glutton Lookup},
   howpublished = {\url{https://github.com/kermitt2/biblio-glutton}},
   publisher    = {GitHub},
@@ -4742,4 +4743,72 @@ eprint = {
     
 }
 
+}
+
+@article{10.1145/1327452.1327492,
+author = {Dean, Jeffrey and Ghemawat, Sanjay},
+title = {MapReduce: Simplified Data Processing on Large Clusters},
+year = {2008},
+issue_date = {January 2008},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {51},
+number = {1},
+issn = {0001-0782},
+url = {https://doi.org/10.1145/1327452.1327492},
+doi = {10.1145/1327452.1327492},
+abstract = {MapReduce is a programming model and an associated implementation for processing and generating large datasets that is amenable to a broad variety of real-world tasks. Users specify the computation in terms of a map and a reduce function, and the underlying runtime system automatically parallelizes the computation across large-scale clusters of machines, handles machine failures, and schedules inter-machine communication to make efficient use of the network and disks. Programmers find the system easy to use: more than ten thousand distinct MapReduce programs have been implemented internally at Google over the past four years, and an average of one hundred thousand MapReduce jobs are executed on Google's clusters every day, processing a total of more than twenty petabytes of data per day.},
+journal = {Commun. ACM},
+month = {jan},
+pages = {107–113},
+numpages = {7}
+}
+
+@inbook{lopez2021mining,
+author = {Lopez, Patrice and Du, Caifan and Cohoon, Johanna and Ram, Karthik and Howison, James},
+title = {Mining Software Entities in Scientific Literature: Document-Level NER for an Extremely Imbalance and Large-Scale Task},
+year = {2021},
+isbn = {9781450384469},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3459637.3481936},
+abstract = {We present a comprehensive information extraction system dedicated to software entities in scientific literature. This task combines the complexity of automatic reading of scientific documents (PDF processing, document structuring, styled/rich text, scaling) with challenges specific to mining software entities: high heterogeneity and extreme sparsity of mentions, document-level cross-references, disambiguation of noisy software mentions and poor portability of Machine Learning approaches between highly specialized domains. While NER is a key component to recognize new and unseen software, considering this task as a simple NER application fails to address most of these issues.In this paper, we propose a multi-model Machine Learning approach where raw documents are ingested by a cascade of document structuring processes applied not to text, but to layout token elements. The cascading process further enriches the relevant structures of the document with a Deep Learning software mention recognizer adapted to the high sparsity of mentions. The Machine Learning cascade culminates with entity disambiguation to alleviate false positives and to provide software entity linking. A bibliographical reference resolution is integrated to the process for attaching references cited alongside the software mentions.Based on the first gold-standard annotated dataset developed for software mentions, this work establishes a new reference end-to-end performance for this task. Experiments with the CORD-19 publications have further demonstrated that our system provides practically usable performance and is scalable to the whole scientific corpus, enabling novel applications for crediting research software and for better understanding the impact of software in science.},
+booktitle = {Proceedings of the 30th ACM International Conference on Information &amp; Knowledge Management},
+pages = {3986–3995},
+numpages = {10}
+}
+
+
+@article{gupta_matscibert_2022,
+	title = {{MatSciBERT}: {A} materials domain language model for text mining and information extraction},
+	volume = {8},
+	issn = {2057-3960},
+	url = {https://doi.org/10.1038/s41524-022-00784-w},
+	doi = {10.1038/s41524-022-00784-w},
+	abstract = {A large amount of materials science knowledge is generated and stored as text published in peer-reviewed scientific literature. While recent developments in natural language processing, such as Bidirectional Encoder Representations from Transformers (BERT) models, provide promising information extraction tools, these models may yield suboptimal results when applied on materials domain since they are not trained in materials science specific notations and jargons. Here, we present a materials-aware language model, namely, MatSciBERT, trained on a large corpus of peer-reviewed materials science publications. We show that MatSciBERT outperforms SciBERT, a language model trained on science corpus, and establish state-of-the-art results on three downstream tasks, named entity recognition, relation classification, and abstract classification. We make the pre-trained weights of MatSciBERT publicly accessible for accelerated materials discovery and information extraction from materials science texts.},
+	number = {1},
+	journal = {npj Computational Materials},
+	author = {Gupta, Tanishq and Zaki, Mohd and Krishnan, N. M. Anoop and {Mausam}},
+	month = may,
+	year = {2022},
+	pages = {102}
+}
+
+
+@misc{hong2022ScholarBERT,
+  doi = {10.48550/ARXIV.2205.11342},
+  
+  url = {https://arxiv.org/abs/2205.11342},
+  
+  author = {Hong, Zhi and Ajith, Aswathy and Pauloski, Gregory and Duede, Eamon and Malamud, Carl and Magoulas, Roger and Chard, Kyle and Foster, Ian},
+  
+  keywords = {Computation and Language (cs.CL), Machine Learning (cs.LG), FOS: Computer and information sciences, FOS: Computer and information sciences, I.2.7},
+  
+  title = {ScholarBERT: Bigger is Not Always Better},
+  
+  publisher = {arXiv},
+  
+  year = {2022},
+  
+  copyright = {Creative Commons Attribution 4.0 International}
 }
