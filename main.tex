@@ -77,7 +77,7 @@ In building the automatic part of this hybrid system (training, evaluation) we u
 In this work, we present \textit{grobid-superconductors}: a system to extract automatically structured information of superconductors materials and properties from scientific literature. 
 The tool is a specialised module of Grobid~\cite{GROBID}, a machine learning library designed to parse and structure scientific documents. 
 Grobid provides an open source platform for building specialised modules: astronomical entities recognition\cite{grobid-astro}, dictionaries~\cite{khemakhem:hal-01508868}, software mentions~\cite{lopez2021mining}, and physical measurements extraction~\cite{foppiano2019quantities}.
-Grobid provides several built-in features including access to PDF document layout information, citation resolution, bibliographic information consolidation through biblio-glutton~\cite{biblio-glutton-lookup} a fast open-source reference matching service for CrossRef data, and a diverse set of ML architectures from a fast linear Conditional Random Field (CRF) to the latest state-of-the-art deep learning implementations.
+Grobid provides several built-in features including access to PDF document layout information, citation resolution, bibliographic information consolidation through \textit{biblio-glutton}~\cite{biblio-glutton-lookup} a fast open-source reference matching service for CrossRef data, and a diverse set of ML architectures from a fast linear Conditional Random Field (CRF) to the latest state-of-the-art deep learning implementations.
 
 % 7. what is our purpose? 
 Using grobid-superconductors and other sub-tools, we established a pipeline for processing a large number of documents and obtaining an automated database of superconductors materials and properties. 
@@ -120,7 +120,7 @@ In training sentences use less memory and can be trained with a larger ``batch s
 
 We decided to use sentence-based text in \textit{grobid-superconductors} after performing experiments on a smaller scale, applied to our tasks. 
 For the NER tasks, we trained and evaluated a sequence labelling model for each version (paragraphs-based and sequence-based) on four annotated documents (3/1 documents partition for training/evaluation) from SuperMat~\cite{foppiano2021supermat}.
-As indicated in Table~\ref{tab:comparison-evaluation-sentences-paragraphs}, the F1-score improved by 64\% (increase of 17.94\%) by using sentence-based text.
+As indicated in Table~\ref{tab:comparison-evaluation-sentences-paragraphs}, the F1-score increase by 17.94 points \% by using sentence-based text.
 % Our intuition suggests that this improvement can be mainly explained by the increase in the number of training examples for the same amount of text.
 
 \begin{table}[ht]
@@ -302,7 +302,7 @@ The features did not provide any improvements with RNN models: BidLSTM\_CRF and 
 This result comes as a surprise because features such superscript/subscript were expected to be determinants for recognising materials sequences. 
 
 The \texttt{<pressure>} label obtained the lowest performances for all architectures, we believe 274 training examples are not sufficient considering that pressure expressions can be dependent from the context because they refer to outher type of pressures (e.g. annealing pressure).
-The labels with the highest score is \texttt{<material>}, with F1 of 80.77\% and 78.06\% for Scibert and BidLSTM\_CRF, respectively. However, taking in account that such label has the highest ``out-of-domain'' ratio in the holdout set (above 75\%, see Figure~\ref{tab:training-holdout-distribution-labels}) and the highest ``label variability'' (the ratio between unique entities and total entities, around 42\%) this suggests that the model can cover well materials that has not been seen in the training. 
+The labels with the highest score is \texttt{<material>}, with F1 of 80.77\% and 78.06\% for Scibert and BidLSTM\_CRF, respectively. However, taking in account that such label has the highest ``out-of-domain'' ratio in the holdout set (above 75\%, see Figure~\ref{fig:out-domain-holdout}) and the highest ``label variability'' (the ratio between unique entities and total entities, around 42\%) this suggests that the model can cover well materials that has not been seen in the training. 
 On the other hand the \texttt{<me\_method>} label, which has lower ``label variability'' (around 11\%) and low ``out-of-domain'' ratio, obtains an F1 score of 66.56\% with Scibert and 65.92\% with BidLSTM\_CRF.
 Surprisingly, for label \texttt{<tc>}, the CRF is outperforming all the other architectures (F1 score of 83.96\%), especially Scibert, which is down to 5 percentage points (78.35\%). We can explain results by pointing out the extremely low variability (12.69\%) of entities labelled as \texttt{<tc>} which is a more favourable terrain for the CRF. %, and having the holdout set with a balanced average ``out-of-domain'' ratio 51\%. 
 % The entity labels variability (ratio of unique entities versus the total) is, in average, around 55\%, and 57\% for the training and holdout sets, respectively. \texttt{<tc>} (12\%) and \texttt{me\_method} have the lowest variability while the \texttt{<material>} has the highest. 
@@ -317,7 +317,7 @@ Unfortunately, we cannot check whether ``above 100K'' or ``W-C nanowire'' are al
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\textwidth]{example-comparison-archs.png}
-\caption{Examples of results from different architectures: CRF, BidLSTM\_CRF and, Scibert}.
+\caption{Examples~\cite{Gajda_2016, Shibata_2016} of results from different architectures: CRF, BidLSTM\_CRF and, Scibert}.
 \label{fig:example-comparison-architectures}
 \end{figure}
 
@@ -778,7 +778,7 @@ label & \textbf{training}  & \textbf{holdout} & \textbf{holdout/training }     \
 \end{tabular}
 
 \caption{Holdout/Training set distribution training and holdout sets for the \textit{material ML model}.}
-\label{tab:training-holdout-set-distribution-annex}
+\label{tab:training-holdout-set-material-distribution-annex}
 \end{table}
 
 \begin{table}[ht]
@@ -800,7 +800,7 @@ label & \textbf{training}  & \textbf{holdout} & \textbf{holdout/training }     \
 \end{tabular}
 
 \caption{Holdout/Training set distribution training and holdout sets on different labels for the \textit{material ML model}.}
-\label{tab:training-holdout-labels-distribution-annex}
+\label{tab:training-holdout-labels-material-distribution-annex}
 \end{table}
 
 
