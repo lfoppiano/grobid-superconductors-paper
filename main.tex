@@ -133,7 +133,7 @@ b) It allows access to PDF document layout information for both machine learning
 \label{fig:pipeline-overview}
 \end{figure}
 
-\paragraph{Abstract versus fulltext}
+\paragraph*{Abstract versus fulltext}
 At the time of writing this paper, we are aware of related works that utilise text from abstracts as training data for machine learning. 
 The main reason is that abstracts are usually freely available as text~\cite{kononova_text-mined_2019}, and contain condensed information~\cite{yamaguchi-etal-2020-sc, court_magnetic_2020}. 
 Accurately parsing the full text presents more challenges, however, they are mitigated by the \textit{Grobid} library and the full texts contain a broader range of information, including the sample preparation process, negative results (e.g. absence of superconductivity for certain samples), and background information (e.g. report on other materials from referenced works). 
@@ -141,7 +141,7 @@ Accurately parsing the full text presents more challenges, however, they are mit
 Thus, \textit{grobid-superconductors} is built to support full-text documents. 
 
 % Sentences vs Paragraphs 
-\paragraph{Paragraphs versus sentences}
+\paragraph*{Paragraphs versus sentences}
 Another question related to NLP processing is whether to use sentence-based or paragraph-based text. 
 While paragraphs can be extracted as part of the layout of PDF documents, obtaining sentences need to add an additional step which processes text using a sentence segmenter.
 However, sentences are smaller by definition (English writing guidelines recommend less than 25 words) and in deep learning, this brings some advantages. 
@@ -201,7 +201,7 @@ For example, a sentence containing a reference in the form ``\textit{Foppiano et
 
 The second step is the \textit{Entities Extraction} performing the Named Entity Recognition (NER) task on previously extracted text. 
 
-\subsubsection{Overview}
+\subsubsection*{Overview}
 
 \begin{figure}[ht]
 \includegraphics[width=\textwidth]{extraction-schema-4}
@@ -270,7 +270,7 @@ Fabrication (\texttt{<fabrication>}) & Represent eventual additional information
 Finally, after all entities are extracted, the post-processing aggregates different mentions of the same materials using the parsed formulas at document-level. 
 For example \texttt{hydrogen} and \texttt{H}, or formula with partial substitutions such as \texttt{La 2 Fe 1-x O 7 (x = 0.1, 0.2)} will be aggregated with materials like \texttt{La 2 Fe 0.9 O 7} appearing in other sections of the same document. 
 
-\subsubsection{Machine Learning study}
+\subsubsection*{Machine Learning study}
 
 In this section we discuss the novel ML models we have trained for extracting specialised entities: \textit{superconductors ML model} and \textit{material ML model} (Figure~\ref{fig:extraction-ml-models-cascade-architecture}). 
 SuperMat~\cite{foppiano2021supermat}, our training dataset, counts 162 papers at the time of writing and is composed of annotated full-text and layout features from PDF documents. 
@@ -286,9 +286,9 @@ For both ML models we trained and evaluated these four architecture/implementati
 The ML models are interfaced by Grobid, which uses the Wapiti\cite{lavergne2010practical} implementation for linear CRF, and DeLFT (Deep Learning For Text)~\cite{DeLFT} for deep learning models.
 The architectures CRF and BidLSTM\_CRF\_FEATURES make use of orthogonal features we have summarised in Table~\ref{tab:ML-model-features}. 
 
-\paragraph{Superconductors ML model}
+\paragraph*{Superconductors ML model}
 
-\subparagraph{Holdout set}
+\subparagraph*{Holdout set}
 The holdout set must be balanced and should follow the same distribution of the target dataset. 
 We assembled the holdout set by manually selecting from SuperMat 32 documents (24\%) with the same ratio of training examples, entities and unique entities (Figure~\ref{fig:training-holdout-set-distribution}a).
 Maintaining the same rate (80/20) for entity type distribution is more challenging: in average, we obtained around 15-18\% of labels of each type in the holdout set (Figure~\ref{fig:training-holdout-set-distribution}b), except for the \texttt{<material>} label (23\%). %(Tables~\ref{tab:training-holdout-set-distribution-annex} and \ref{tab:training-holdout-distribution-labels}). 
@@ -313,12 +313,12 @@ All the labels have ``out-of-domain'' ratio above 24\%  (Figure~\ref{fig:out-dom
 \label{fig:out-domain-holdout}
 \end{figure}
 
-\subparagraph{Positive sampling} 
+\subparagraph*{Positive sampling} 
 We train the model with positive sampling by removing the examples without entities (negative examples, Figure~\ref{fig:training-holdout-set-distribution}a). 
 Compared with no sampling, this approach provides an improvement by +2\% in both precision and recall, when testing against the holdout set. 
 Further experiments with active and random sampling with 0.1, 0.25, 0.5 and 1.0 ratio of negative examples~\cite{lopez2021mining} did not provide stable evidence suggesting improvements for our task. 
 
-\subparagraph{Evaluation}
+\subparagraph*{Evaluation}
 
 We report the evaluation results in Table~\ref{tab:evaluation-superconductors-ML-model}. 
 The best results were obtained by Scibert with an F1 of 77.03\%, and recall of around 80.69\%. 
@@ -368,12 +368,12 @@ All (micro avg) & 76.88 & 72.77 & 74.77 & 74.59 & 77.67 & 76.09 & \textbf{75.17}
 \caption{\label{tab:evaluation-superconductors-ML-model} Evaluation scores for the superconductor ML model in the four architectures. For DL architecture the results are average over 5 runs. Support (Supp) indicate the number of labels in the training data. }
 \end{table}
 
-\paragraph{Material ML model}
+\paragraph*{Material ML model}
 
 To train the \textit{material ML model} we create a special dataset with an additional layer of labels (Table~\ref{tab:material-parser-entities}) having as input the material information represented by entities annotated as \texttt{<material>} in the SuperMat documents.
 % (label \texttt{<material>} from \textit{superconductors ML model}, Table~\ref{tab:superconductors-parser-entities}), that is,
 
-\subparagraph{Holdout set}
+\subparagraph*{Holdout set}
 The annotations are performed on smaller chunks of text and the throughput is largely higher than the initial effort to develop SuperMat therefore we created an independent holdout set. 
 We used material data extracted from a dataset of 500 documents (500-papers) from three publishers: \textit{American Institute of Physics} (AIP), \textit{American Physical Society} (APS) and \textit{Institute of Physics} (IOP)~\cite{foppiano2019proposal}.
 The resulting holdout set has a average coverage above 25\% (Figure~\ref{fig:material-training-holdout-set-distribution}) and an ``out-of-domain'' ratio in average of 83.93\% (Figure~\ref{fig:material-out-domain-holdout}). 
@@ -392,7 +392,7 @@ The resulting holdout set has a average coverage above 25\% (Figure~\ref{fig:mat
 \label{fig:material-out-domain-holdout}
 \end{figure}
 
-\subparagraph{Evaluation}
+\subparagraph*{Evaluation}
 
 The results shown in Table~\ref{tab:evaluation-10fold-material-parser} indicate that Scibert obtains the best results, with F1 at 84.15\%.
 We confirm for this model that features can be ignored with the BidLSTM\_CRF architecture, they improve the results by less than 1\% (from 83.13 to 83.76\%). 
@@ -740,9 +740,18 @@ In future, we plan to improve our tools by a) extracting more properties, such a
 We confirmed the good generalisation ability of the Scibert architecture for NER task in materials science domain. 
 There are hopes to obtain better results using materials science pre-trained BERT, such as matscibert~\cite{gupta_matscibert_2022}, however, the gain might be just minimal for relatively larger models~\cite{hong2022ScholarBERT}.
 
-\section{Acknowledgement}
+\section*{Acknowledgement}
 \label{sec:acknowledgement}
 Our warmest thanks to Patrice Lopez, the author of Grobid~\cite{GROBID}, DeLFT~\citep{DeLFT} and many other interesting open-source projects.
+
+%\section*{Notes on contributors}
+% for later 
+
+
+\section*{Competing interests} 
+
+The authors declare no competing interests.
+
 
 \bibliography{bibliography}
 \bibliographystyle{tfnlm}
@@ -750,7 +759,7 @@ Our warmest thanks to Patrice Lopez, the author of Grobid~\cite{GROBID}, DeLFT~\
 % \begin{appendices}
 \appendix
 
-\section{Additional material}
+\section{Dataset additional information}
 
 \begin{table}[ht]
 \centering\small
@@ -832,7 +841,9 @@ label & \textbf{training}  & \textbf{holdout} & \textbf{holdout/training }     \
 \end{table}
 
 
-\begin{table}[ht]
+\section{Machine learning support material}
+
+\begin{table}[ht]!
 \centering\small
 \scalebox{0.71}{
 \begin{tabular}{l m{30em} c c}
