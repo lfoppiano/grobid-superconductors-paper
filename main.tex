@@ -1,9 +1,25 @@
-\documentclass{article}
+% interactnlmsample.tex
+% v1.05 - August 2017
+
+\documentclass[]{interact}
+
+\usepackage{epstopdf}% To incorporate .eps illustrations using PDFLaTeX, etc.
+\usepackage[caption=false]{subfig}% Support for small, `sub' figures and tables
+%\usepackage[nolists,tablesfirst]{endfloat}% To `separate' figures and tables from text if required
+%\usepackage[doublespacing]{setspace}% To produce a `double spaced' document if required
+%\setlength\parindent{24pt}% To increase paragraph indentation when line spacing is doubled
+
+\usepackage[numbers,sort&compress]{natbib}% Citation support using natbib.sty
+\bibpunct[, ]{[}{]}{,}{n}{,}{,}% Citation support using natbib.sty
+\renewcommand\bibfont{\fontsize{10}{12}\selectfont}% Bibliography support using natbib.sty
+\makeatletter% @ becomes a letter
+\def\NAT@def@citea{\def\@citea{\NAT@separator}}% Suppress spaces between citations using natbib.sty
+\makeatother% @ becomes a symbol again
+
 \usepackage[utf8]{inputenc}
 \usepackage{url}
 \usepackage{graphicx}
 \graphicspath{{images/}}
-\usepackage{authblk}
 \usepackage{csquotes}
 \usepackage{booktabs}
 \usepackage{array}
@@ -16,27 +32,35 @@
 \usepackage{pdflscape}
 \usepackage{afterpage}
 
+\theoremstyle{plain}% Theorem-like structures provided by amsthm.sty
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+\newtheorem{notation}{Notation}
+
 \newcommand{\tc}{T$_{c}$}
 \providecommand{\keywords}[1]
-{
-  \small	
-  \textbf{\textit{Keywords---}} #1
-}
 
-
-\title{Automatic Extraction of Materials and Properties from Superconductors Scientific Literature}
-\author[1]{Luca Foppiano}
-\author[2]{Pedro Baptista de Castro}
-\author[3]{Pedro Ortiz Suarez}
-\author[2]{Kensei Terashima}
-\author[2]{Yoshihiko Takano}
-\author[1]{Masashi Ishii}
-
-\affil[1]{Material Database Group, MaDIS, NIMS, Tsukuba, Japan}
-\affil[2]{Nano Frontier Superconducting Materials Group, MANA, NIMS, Tsukuba, Japan}
-\affil[3]{Data and Web Science Group, University of Mannheim, Mannheim, Germany}
 
 \begin{document}
+
+\articletype{RESEARCH PAPER}% Specify the article type or omit as appropriate
+
+\title{Automatic Extraction of Materials and Properties from Superconductors Scientific Literature}
+
+\author{
+\name{Luca Foppiano\textsuperscript{a}\thanks{Corresponding authors: Luca Foppiano (luca@foppiano.org) and Masashi Ishii (ISHII.Masashi@nims.go.jp)}, Pedro Baptista de Castro\textsuperscript{b}, Pedro Ortiz Suarez\textsuperscript{c}, Kensei Terashima\textsuperscript{b}, Yoshihiko Takano\textsuperscript{b}, Masashi Ishii\textsuperscript{a}}
+\affil{\textsuperscript{a}Material Database Group, MaDIS, NIMS, Tsukuba, JP; \textsuperscript{b}Nano Frontier Superconducting Materials Group, MANA, NIMS, Tsukuba, JP; \textsuperscript{c}Data and Web Science Group, University of Mannheim, Mannheim, DE}
+}
+
 
 \maketitle
 
@@ -49,7 +73,14 @@ The material (or sample) information is represented by name, chemical formula, m
 The properties include the T\textsubscript{c} superconducting critical temperature and, when available, applied pressure with T\textsubscript{c} measurement method.
 \end{abstract}
 
-\keywords{material informatics, superconductors, machine learning, nlp, tdm}
+\begin{keywords}
+materials informatics, superconductors, machine learning, nlp, tdm
+\end{keywords}
+
+\begin{quote}
+    \textbf{CLASSIFICATION}: Machine learning, Text mining, NLP
+\end{quote}
+
 
 \section{Introduction}
 In recent years, with the creation of computational databases, such as the Materials Project (MP)~\cite{materialsprojectJain2013}, the Open Quantum Materials Database (OQMD)~\cite{oqmdkirklin2015open}, and then experimental data repositories such as NIMS MDR (\url{http://mdr.nims.go.jp})~\cite{ranganathan_anusha_2019_3553963}, the focus has been steadily shifting towards a data-driven design of materials which is often called as Materials Informatics (MI). 
@@ -199,13 +230,6 @@ T\textit{c} expressions (\texttt{<tc>}) & Expressions in the text that provide i
 Measurement methods (\texttt{<me\_method>}) & Techniques used to measure or calculate the presence of superconductivity. \\
 Applied pressure (\texttt{<pressure>}) & Applied pressure when superconductivity is recorded\\
 \bottomrule
-% \hline
-% \multicolumn{2}{c}{\textbf{Rule-based}} \\
-% \hline
-% Crystal structure type (\texttt{<crystal-structure>}) & Geometry of arrangement of particles in the unit cell\\
-% Space groups (\texttt{<space-group>}) & Symmetry group, usually in three dimensions\\
-% Unit cells type (\texttt{<unit-cells>}) & A repeating unit formed by the vectors spanning the points of a lattice\\
-% \hline
 \end{tabular}
 }
 \caption{Synthesis of the superconductors parser entities. }
@@ -614,8 +638,10 @@ Currently SuperCon\textsuperscript{2} contains 40324 records including 2052 trip
 % The schema contains additional information which are described in Table~\ref{tab:superconductors-parser-entities} and~\ref{tab:material-parser-entities} and richer bibliographic data described in Section~\ref{subsubsec:document-structuring}. 
 The schema of SuperCon\textsuperscript{2} is summarised with examples in Table~\ref{tab:supercon2-schema}. 
 
+
 \afterpage {
     \clearpage % Flush earlier floats (otherwise order might not be correct)
+%    \begin{landscape}
     
 \begin{table}[ht]
 \centering\small
@@ -658,18 +684,20 @@ Section & The main body section of the paper & Header, body, annex\\
 \hline[dotted]
 Subsection & The secondary segmentation area of the paper & {Paragraph, table caption,\\ figure caption, title, abstract} \\
 \hline[dotted]
-{Authors,\\ Title, DOI,\\ Publisher,\\ Journal, Year} & \multicolumn{2}{c}{The respective bibliographic information}\\
+{Authors,\\ Title, DOI,\\ Publisher,\\ Journal, Year} & \multicolumn{2}{c}{Bibliographic information of the document}\\
 \hline[dashed]
 \multicolumn{3}{c}{\emph{Internal information}} \\
 \hline[dashed]
-{Hash,\\ Timestamp} & \multicolumn{2}{c}{The Hash of the binary content of the original PDF and the timestamp of the upload.}\\
+{Hash,\\ Timestamp} & \multicolumn{2}{c}{Hash calculated on the binary content of the original PDF document and the timestamp when the document was processed.}\\
 \hline[1pt]
 \end{tblr}
 }
 \caption{\label{tab:supercon2-schema} Summary and description of the SuperCon\textsuperscript{2} schema. \textit{Internal information} are technical information not accessible to the users.}
 \end{table}
     \clearpage 
+%    \end{landscape}
 }
+
 
 The data is ingested through the asynchronous Map-Reduce approach~\cite{10.1145/1327452.1327492}. 
 The ``Extraction task'' processes the PDF documents with \textit{grobid-superconductors} and stores their processed representation together with the original PDF document.
@@ -714,10 +742,10 @@ There are hopes to obtain better results using materials science pre-trained BER
 
 \section{Acknowledgement}
 \label{sec:acknowledgement}
-Our warmest thanks to Patrice Lopez, the author of Grobid (\url{https://github.com/kermitt2/grobid}), DeLFT (\url{https://github.com/kermitt2/delft}) and other interesting TDM open-source projects.
+Our warmest thanks to Patrice Lopez, the author of Grobid~\cite{GROBID}, DeLFT~\citep{DeLFT} and many other interesting open-source projects.
 
 \bibliography{bibliography}
-\bibliographystyle{unsrt}
+\bibliographystyle{tfnlm}
 
 % \begin{appendices}
 \appendix
@@ -827,7 +855,7 @@ label & \textbf{training}  & \textbf{holdout} & \textbf{holdout/training }     \
 \textbf{20} & Font style: standard (BASELINE), superscript (SUPERSCRIPT) or subscript (SUBSCRIPT) & superconductors & all\\
 \textbf{21} & (boolean) if the token style is bold  & superconductors & all\\
 \textbf{22} & (boolean) if the token style is italic & superconductors & all\\
-\textbf{23} & (boolean) the token is identified as a chemical compound by ChemDataExtractor\cite{chemdataextractor1}  & superconductors & all\\
+\textbf{23} & (boolean) the token is identified as a chemical compound by ChemDataExtractor\cite{chemdataextractor}  & superconductors & all\\
 \bottomrule
 \end{tabular}
 }
