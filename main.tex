@@ -57,18 +57,18 @@
 \title{Automatic Extraction of Materials and Properties from Superconductors Scientific Literature}
 
 \author{
-\name{Luca Foppiano\textsuperscript{a}\thanks{Corresponding authors: Luca Foppiano (luca@foppiano.org) and Masashi Ishii (ISHII.Masashi@nims.go.jp)}, Pedro Baptista de Castro\textsuperscript{b}, Pedro Ortiz Suarez\textsuperscript{c}, Kensei Terashima\textsuperscript{b}, Yoshihiko Takano\textsuperscript{b}, Masashi Ishii\textsuperscript{a}}
-\affil{\textsuperscript{a}Material Database Group, MaDIS, NIMS, Tsukuba, JP; \textsuperscript{b}Nano Frontier Superconducting Materials Group, MANA, NIMS, Tsukuba, JP; \textsuperscript{c}Data and Web Science Group, University of Mannheim, Mannheim, DE}
+    \name{Luca Foppiano\textsuperscript{a}\thanks{Corresponding authors: Luca Foppiano (luca@foppiano.org) and Masashi Ishii (ISHII.Masashi@nims.go.jp)}, Pedro Baptista de Castro\textsuperscript{b}, Pedro Ortiz Suarez\textsuperscript{c}, Kensei Terashima\textsuperscript{b}, Yoshihiko Takano\textsuperscript{b}, Masashi Ishii\textsuperscript{a}}
+    \affil{\textsuperscript{a}Material Database Group, MaDIS, NIMS, Tsukuba, JP; \textsuperscript{b}Nano Frontier Superconducting Materials Group, MANA, NIMS, Tsukuba, JP; \textsuperscript{c}Data and Web Science Group, University of Mannheim, Mannheim, DE}
 }
 
 
 \maketitle
 
 \begin{abstract}
-The automatic extraction of materials and related properties from the scientific literature is getting more attention in data-driven materials science (Materials Informatics). 
+The automatic extraction of materials and related properties from the scientific literature is getting more attention in data-driven materials science (Materials Informatics).
 In this paper, we discuss grobid-superconductors, our solution for automatically extract superconductor material names and respective properties from text.
-Built as Grobid module it combines Machine Learning and Heuristic approaches in a multi-step  architecture supporting input data as raw text or PDF documents. 
-Using grobid-superconductors, we built SuperCon\textsuperscript{2}, a database of 40324 materials-properties records from 37700 papers. 
+Built as Grobid module it combines Machine Learning and Heuristic approaches in a multi-step  architecture supporting input data as raw text or PDF documents.
+Using grobid-superconductors, we built SuperCon\textsuperscript{2}, a database of 40324 materials-properties records from 37700 papers.
 The material (or sample) information is represented by name, chemical formula, material class, and is characterised by shape, doping, variables for components, substrate as adjoined information.
 The properties include the T\textsubscript{c} superconducting critical temperature and, when available, applied pressure with T\textsubscript{c} measurement method.
 \end{abstract}
@@ -78,7 +78,7 @@ materials informatics, superconductors, machine learning, nlp, tdm
 \end{keywords}
 
 \begin{quote}
-    \textbf{CLASSIFICATION}: Machine learning, Text mining, NLP
+\textbf{CLASSIFICATION}: Machine learning, Text mining, NLP
 \end{quote}
 
 
@@ -123,7 +123,7 @@ The ``method'' used to measure the superconducting transition temperature \tc~(a
 % Overview from the other paper, what are the differences and some repetition on the previous paper 
 \textit{Grobid-superconductor} is a web application for processing text or PDF documents to extract materials and corresponding properties. 
 We develop \textit{grobid-superconductors} as a \textit{Grobid} library~\cite{GROBID} module following some principles (multi-step, sentence-based, fulltext-based) discussed in a previous preliminary study~\cite{foppiano:hal-02870896}.  
-\textit{Grobid} bring several advantages: a) It integrates with \textit{pdfalto}\footnote{\url{https://github.com/kermitt2/pdfalto}}, a specialised tool for converting PDF to XML which mitigates extraction issues such as the resolution of embedded fonts, invalid character encoding, and the reconstruction of the correct reading order. 
+\textit{Grobid} brings several advantages: a) It integrates with \textit{pdfalto}\footnote{\url{https://github.com/kermitt2/pdfalto}}, a specialised tool for converting PDF to XML which mitigates extraction issues such as the resolution of embedded fonts, invalid character encoding, and the reconstruction of the correct reading order.
 b) It allows access to PDF document layout information for both machine learning and document decoration (e.g. coordinates in the PDF document) and, finally, c) it provides access to a set of high-quality, pre-trained machine learning models for structuring documents.
 \textit{Grobid-superconductors} is structured as a three-steps process as illustrated in Figure~\ref{fig:pipeline-overview} and described in the following sections~\ref{subsubsec:document-structuring},~\ref{subsubsec:extraction}, and~\ref{subsubsec:linking}.
 
@@ -143,10 +143,10 @@ Thus, \textit{grobid-superconductors} is built to support full-text documents.
 % Sentences vs Paragraphs 
 \paragraph*{Paragraphs versus sentences}
 Another question related to NLP processing is whether to use sentence-based or paragraph-based text. 
-While paragraphs can be extracted as part of the layout of PDF documents, obtaining sentences need to add an additional step which processes text using a sentence segmenter.
+While paragraphs can be extracted as part of the layout of PDF documents, obtaining sentences adds an additional step which processes text using a sentence segmenter.
 However, sentences are smaller by definition (English writing guidelines recommend less than 25 words) and in deep learning, this brings some advantages. 
-In training and prediction, sentences will likely be shorter than the "max sequence length" limitation (e.g. 512 tokens for transformers). 
-In training sentences use less memory and can be trained with a larger ``batch size'', which provide better results~\cite{roberta}.
+In training and prediction, sentences will likely be shorter than the ``max sequence length'' limitation (e.g. 512 tokens for transformers).
+During training sentences also use less memory and let us train models with a larger ``batch size'', which has been shown to provide better results~\cite{roberta}.
 %, and c) SciBERT~\cite{Beltagy2019SciBERT} models are pre-trained on sentences while RoBERTa~\cite{roberta} models are pre-trained with splitting paragraphs.
 
 We decided to use sentence-based text in \textit{grobid-superconductors} after performing experiments on a smaller scale, applied to our tasks. 
@@ -169,12 +169,12 @@ Sentence-based micro avg. & 48.41 & 50.00 & 51.70  \\
 
 In the Linking task we want to maximise precision. 
 In our previous work~\cite{foppiano2019proposal} we noticed that limiting linking entities within the same sentence (versus paragraphs) would obtain higher precision (68.7\% versus 57\%) at the expense of lower recall (6.5\% versus 10.7\%), and F1-score (11.87\% versus 18.01\%). 
-In both our tasks we found evidences that a sentence-based dataset is more beneficial than paragraph-based dataset. 
+In both our tasks we found evidence that a sentence-based dataset is more beneficial than paragraph-based dataset.
 
 
 \subsection{Document structuring and pre-processing}
 \label{subsubsec:document-structuring}
-In the first step in our process, the PDF document is converted into an internal model based on a list of text statements, tokens, and features. 
+In the first step of our process, the PDF document is converted into an internal model based on a list of text statements, tokens, and features.
 The input document is processed using the Grobid original models where we apply customised processes for document header and content. 
 We select a subset of bibliographic information from the header: title, authors, DOI, publisher, journal, and year of publication and we consolidate them via Grobid to match the publisher's quality (even by processing the ``preprint version'' of the publication). 
 The superconductors entities extraction is applied to the content, only on relevant text items: title, abstract, text content from body or annexe, text content from figure and table captions (Figure~\ref{fig:grobid-document-processing}).
@@ -688,7 +688,7 @@ Subsection & The secondary segmentation area of the paper & {Paragraph, table ca
 \hline[dashed]
 \multicolumn{3}{c}{\emph{Internal information}} \\
 \hline[dashed]
-{Hash,\\ Timestamp} & \multicolumn{2}{c}{Hash calculated on the binary content of the original PDF document and the timestamp when the document was processed.}\\
+                {Hash,                                                                                                 \\ Timestamp} & \multicolumn{2}{c}{Hash calculated on the binary content of the original PDF\\ document and the timestamp when the document was processed.}\\
 \hline[1pt]
 \end{tblr}
 }
