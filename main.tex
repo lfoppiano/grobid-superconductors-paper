@@ -641,7 +641,6 @@ The schema of SuperCon\textsuperscript{2} is summarised with examples in Table~\
 
 \afterpage {
     \clearpage % Flush earlier floats (otherwise order might not be correct)
-%    \begin{landscape}
     
 \begin{table}[ht]
 \centering\small
@@ -664,7 +663,7 @@ Shape  & The shape of the material or the sample & {Single crystal, polycrystal,
 \hline[dotted]
 Variables  & Variables that can be substituted in the formula & x = 0, RE=Ln,St\\
 \hline[dotted]
-Class  && material classification according to the domain-experts taxonomy & cuprates, oxides, alloys\\
+Class  & {Material classification according\\ to the domain-experts taxonomy} & cuprates, oxides, alloys\\
 \hline[dotted]
 Fabrication  & {All the information that does not\\ belong to any of the previous tags} &  {Intercalated,\\ synthesized by MBE method,\\ electron-doped, hole-doped} \\
 \hline[dotted]
@@ -695,7 +694,6 @@ Subsection & The secondary segmentation area of the paper & {Paragraph, table ca
 \caption{\label{tab:supercon2-schema} Summary and description of the SuperCon\textsuperscript{2} schema. \textit{Internal information} are technical information not accessible to the users.}
 \end{table}
     \clearpage 
-%    \end{landscape}
 }
 
 
@@ -721,7 +719,7 @@ The pipeline uses a persistence layer for storage and reporting (logger) accessi
 We built a visualisation interface to exploit the extracted information. 
 Users can search in the synthesised tabular data, access the PDF document enriched with the extracted information (Figure~\ref{fig:pdf-annotations}), and export locally in CSV, TSV and Microsoft Excel formats. 
 
-\begin{figure}[ht]
+\begin{figure}[ht!]
 \centering
 \includegraphics[width=0.8\textwidth]{sample-pdf-annotations}
 \caption{\label{fig:pdf-annotations} Example of superconductors research PDF document~\cite{sample_superconductors_article} enriched with extracted annotations. Materials information (class, formula) and properties (\tc) are summarised in the information box when clicking to the highlighted annotated entity in the text.}
