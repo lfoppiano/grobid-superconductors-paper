@@ -1,9 +1,25 @@
-\documentclass{article}
+% interactnlmsample.tex
+% v1.05 - August 2017
+
+\documentclass[]{interact}
+
+\usepackage{epstopdf}% To incorporate .eps illustrations using PDFLaTeX, etc.
+\usepackage[caption=false]{subfig}% Support for small, `sub' figures and tables
+%\usepackage[nolists,tablesfirst]{endfloat}% To `separate' figures and tables from text if required
+%\usepackage[doublespacing]{setspace}% To produce a `double spaced' document if required
+%\setlength\parindent{24pt}% To increase paragraph indentation when line spacing is doubled
+
+\usepackage[numbers,sort&compress]{natbib}% Citation support using natbib.sty
+\bibpunct[, ]{[}{]}{,}{n}{,}{,}% Citation support using natbib.sty
+\renewcommand\bibfont{\fontsize{10}{12}\selectfont}% Bibliography support using natbib.sty
+\makeatletter% @ becomes a letter
+\def\NAT@def@citea{\def\@citea{\NAT@separator}}% Suppress spaces between citations using natbib.sty
+\makeatother% @ becomes a symbol again
+
 \usepackage[utf8]{inputenc}
 \usepackage{url}
 \usepackage{graphicx}
 \graphicspath{{images/}}
-\usepackage{authblk}
 \usepackage{csquotes}
 \usepackage{booktabs}
 \usepackage{array}
@@ -16,27 +32,35 @@
 \usepackage{pdflscape}
 \usepackage{afterpage}
 
+\theoremstyle{plain}% Theorem-like structures provided by amsthm.sty
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+\newtheorem{notation}{Notation}
+
 \newcommand{\tc}{T$_{c}$}
 \providecommand{\keywords}[1]
-{
-  \small	
-  \textbf{\textit{Keywords---}} #1
-}
 
-
-\title{Automatic Extraction of Materials and Properties from Superconductors Scientific Literature}
-\author[1]{Luca Foppiano}
-\author[2]{Pedro Baptista de Castro}
-\author[3]{Pedro Ortiz Suarez}
-\author[2]{Kensei Terashima}
-\author[2]{Yoshihiko Takano}
-\author[1]{Masashi Ishii}
-
-\affil[1]{Material Database Group, MaDIS, NIMS, Tsukuba, Japan}
-\affil[2]{Nano Frontier Superconducting Materials Group, MANA, NIMS, Tsukuba, Japan}
-\affil[3]{Data and Web Science Group, University of Mannheim, Mannheim, Germany}
 
 \begin{document}
+
+\articletype{RESEARCH PAPER}% Specify the article type or omit as appropriate
+
+\title{Automatic Extraction of Materials and Properties from Superconductors Scientific Literature}
+
+\author{
+\name{Luca Foppiano\textsuperscript{a}\thanks{Corresponding authors: Luca Foppiano (luca@foppiano.org) and Masashi Ishii (ISHII.Masashi@nims.go.jp)}, Pedro Baptista de Castro\textsuperscript{b}, Pedro Ortiz Suarez\textsuperscript{c}, Kensei Terashima\textsuperscript{b}, Yoshihiko Takano\textsuperscript{b}, Masashi Ishii\textsuperscript{a}}
+\affil{\textsuperscript{a}Material Database Group, MaDIS, NIMS, Tsukuba, JP; \textsuperscript{b}Nano Frontier Superconducting Materials Group, MANA, NIMS, Tsukuba, JP; \textsuperscript{c}Data and Web Science Group, University of Mannheim, Mannheim, DE}
+}
+
 
 \maketitle
 
@@ -49,7 +73,14 @@ The material (or sample) information is represented by name, chemical formula, m
 The properties include the T\textsubscript{c} superconducting critical temperature and, when available, applied pressure with T\textsubscript{c} measurement method.
 \end{abstract}
 
-\keywords{material informatics, superconductors, machine learning, nlp, tdm}
+\begin{keywords}
+materials informatics, superconductors, machine learning, nlp, tdm
+\end{keywords}
+
+\begin{quote}
+    \textbf{CLASSIFICATION}: Machine learning, Text mining, NLP
+\end{quote}
+
 
 \section{Introduction}
 In recent years, with the creation of computational databases, such as the Materials Project (MP)~\cite{materialsprojectJain2013}, the Open Quantum Materials Database (OQMD)~\cite{oqmdkirklin2015open}, and then experimental data repositories such as NIMS MDR (\url{http://mdr.nims.go.jp})~\cite{ranganathan_anusha_2019_3553963}, the focus has been steadily shifting towards a data-driven design of materials which is often called as Materials Informatics (MI). 
@@ -97,12 +128,12 @@ b) It allows access to PDF document layout information for both machine learning
 \textit{Grobid-superconductors} is structured as a three-steps process as illustrated in Figure~\ref{fig:pipeline-overview} and described in the following sections~\ref{subsubsec:document-structuring},~\ref{subsubsec:extraction}, and~\ref{subsubsec:linking}.
 
 \begin{figure}[ht]
-\includegraphics[width=\textwidth]{overview-schema-3}
+\includegraphics[width=\textwidth]{schema-architecture-colors}
 \caption{Processing pipeline for extracting superconductors materials and properties. }
 \label{fig:pipeline-overview}
 \end{figure}
 
-\paragraph{Abstract versus fulltext}
+\paragraph*{Abstract versus fulltext}
 At the time of writing this paper, we are aware of related works that utilise text from abstracts as training data for machine learning. 
 The main reason is that abstracts are usually freely available as text~\cite{kononova_text-mined_2019}, and contain condensed information~\cite{yamaguchi-etal-2020-sc, court_magnetic_2020}. 
 Accurately parsing the full text presents more challenges, however, they are mitigated by the \textit{Grobid} library and the full texts contain a broader range of information, including the sample preparation process, negative results (e.g. absence of superconductivity for certain samples), and background information (e.g. report on other materials from referenced works). 
@@ -110,7 +141,7 @@ Accurately parsing the full text presents more challenges, however, they are mit
 Thus, \textit{grobid-superconductors} is built to support full-text documents. 
 
 % Sentences vs Paragraphs 
-\paragraph{Paragraphs versus sentences}
+\paragraph*{Paragraphs versus sentences}
 Another question related to NLP processing is whether to use sentence-based or paragraph-based text. 
 While paragraphs can be extracted as part of the layout of PDF documents, obtaining sentences need to add an additional step which processes text using a sentence segmenter.
 However, sentences are smaller by definition (English writing guidelines recommend less than 25 words) and in deep learning, this brings some advantages. 
@@ -149,7 +180,7 @@ We select a subset of bibliographic information from the header: title, authors,
 The superconductors entities extraction is applied to the content, only on relevant text items: title, abstract, text content from body or annexe, text content from figure and table captions (Figure~\ref{fig:grobid-document-processing}).
 
 \begin{figure}[ht]
-\includegraphics[width=\textwidth]{grobid-extraction-2}
+\includegraphics[width=\textwidth]{document-structuring-colors}
 \caption{Grobid-superconductors extraction processes (bibliographic information, superconductors entities extraction and sentence segmentation) within the Grobid cascade data flow.}
 \label{fig:grobid-document-processing}
 \end{figure}
@@ -170,10 +201,10 @@ For example, a sentence containing a reference in the form ``\textit{Foppiano et
 
 The second step is the \textit{Entities Extraction} performing the Named Entity Recognition (NER) task on previously extracted text. 
 
-\subsubsection{Overview}
+\subsubsection*{Overview}
 
 \begin{figure}[ht]
-\includegraphics[width=\textwidth]{extraction-schema-4}
+\includegraphics[width=\textwidth]{schema-extraction-colors}
 \caption{\label{fig:extraction-ml-models-cascade-architecture} Cascade architecture in the Entities Extraction step. The white rectangles indicate the extracted information (described in Tables~\ref{tab:superconductors-parser-entities} and~\ref{tab:material-parser-entities}). 
 The ML models and the rule-based algorithms are identified by light grey and dark grey shapes, respectively.}
 \end{figure}
@@ -199,13 +230,6 @@ T\textit{c} expressions (\texttt{<tc>}) & Expressions in the text that provide i
 Measurement methods (\texttt{<me\_method>}) & Techniques used to measure or calculate the presence of superconductivity. \\
 Applied pressure (\texttt{<pressure>}) & Applied pressure when superconductivity is recorded\\
 \bottomrule
-% \hline
-% \multicolumn{2}{c}{\textbf{Rule-based}} \\
-% \hline
-% Crystal structure type (\texttt{<crystal-structure>}) & Geometry of arrangement of particles in the unit cell\\
-% Space groups (\texttt{<space-group>}) & Symmetry group, usually in three dimensions\\
-% Unit cells type (\texttt{<unit-cells>}) & A repeating unit formed by the vectors spanning the points of a lattice\\
-% \hline
 \end{tabular}
 }
 \caption{Synthesis of the superconductors parser entities. }
@@ -246,7 +270,7 @@ Fabrication (\texttt{<fabrication>}) & Represent eventual additional information
 Finally, after all entities are extracted, the post-processing aggregates different mentions of the same materials using the parsed formulas at document-level. 
 For example \texttt{hydrogen} and \texttt{H}, or formula with partial substitutions such as \texttt{La 2 Fe 1-x O 7 (x = 0.1, 0.2)} will be aggregated with materials like \texttt{La 2 Fe 0.9 O 7} appearing in other sections of the same document. 
 
-\subsubsection{Machine Learning study}
+\subsubsection*{Machine Learning study}
 
 In this section we discuss the novel ML models we have trained for extracting specialised entities: \textit{superconductors ML model} and \textit{material ML model} (Figure~\ref{fig:extraction-ml-models-cascade-architecture}). 
 SuperMat~\cite{foppiano2021supermat}, our training dataset, counts 162 papers at the time of writing and is composed of annotated full-text and layout features from PDF documents. 
@@ -262,9 +286,9 @@ For both ML models we trained and evaluated these four architecture/implementati
 The ML models are interfaced by Grobid, which uses the Wapiti\cite{lavergne2010practical} implementation for linear CRF, and DeLFT (Deep Learning For Text)~\cite{DeLFT} for deep learning models.
 The architectures CRF and BidLSTM\_CRF\_FEATURES make use of orthogonal features we have summarised in Table~\ref{tab:ML-model-features}. 
 
-\paragraph{Superconductors ML model}
+\paragraph*{Superconductors ML model}
 
-\subparagraph{Holdout set}
+\subparagraph*{Holdout set}
 The holdout set must be balanced and should follow the same distribution of the target dataset. 
 We assembled the holdout set by manually selecting from SuperMat 32 documents (24\%) with the same ratio of training examples, entities and unique entities (Figure~\ref{fig:training-holdout-set-distribution}a).
 Maintaining the same rate (80/20) for entity type distribution is more challenging: in average, we obtained around 15-18\% of labels of each type in the holdout set (Figure~\ref{fig:training-holdout-set-distribution}b), except for the \texttt{<material>} label (23\%). %(Tables~\ref{tab:training-holdout-set-distribution-annex} and \ref{tab:training-holdout-distribution-labels}). 
@@ -289,12 +313,12 @@ All the labels have ``out-of-domain'' ratio above 24\%  (Figure~\ref{fig:out-dom
 \label{fig:out-domain-holdout}
 \end{figure}
 
-\subparagraph{Positive sampling} 
+\subparagraph*{Positive sampling} 
 We train the model with positive sampling by removing the examples without entities (negative examples, Figure~\ref{fig:training-holdout-set-distribution}a). 
 Compared with no sampling, this approach provides an improvement by +2\% in both precision and recall, when testing against the holdout set. 
 Further experiments with active and random sampling with 0.1, 0.25, 0.5 and 1.0 ratio of negative examples~\cite{lopez2021mining} did not provide stable evidence suggesting improvements for our task. 
 
-\subparagraph{Evaluation}
+\subparagraph*{Evaluation}
 
 We report the evaluation results in Table~\ref{tab:evaluation-superconductors-ML-model}. 
 The best results were obtained by Scibert with an F1 of 77.03\%, and recall of around 80.69\%. 
@@ -344,12 +368,12 @@ All (micro avg) & 76.88 & 72.77 & 74.77 & 74.59 & 77.67 & 76.09 & \textbf{75.17}
 \caption{\label{tab:evaluation-superconductors-ML-model} Evaluation scores for the superconductor ML model in the four architectures. For DL architecture the results are average over 5 runs. Support (Supp) indicate the number of labels in the training data. }
 \end{table}
 
-\paragraph{Material ML model}
+\paragraph*{Material ML model}
 
 To train the \textit{material ML model} we create a special dataset with an additional layer of labels (Table~\ref{tab:material-parser-entities}) having as input the material information represented by entities annotated as \texttt{<material>} in the SuperMat documents.
 % (label \texttt{<material>} from \textit{superconductors ML model}, Table~\ref{tab:superconductors-parser-entities}), that is,
 
-\subparagraph{Holdout set}
+\subparagraph*{Holdout set}
 The annotations are performed on smaller chunks of text and the throughput is largely higher than the initial effort to develop SuperMat therefore we created an independent holdout set. 
 We used material data extracted from a dataset of 500 documents (500-papers) from three publishers: \textit{American Institute of Physics} (AIP), \textit{American Physical Society} (APS) and \textit{Institute of Physics} (IOP)~\cite{foppiano2019proposal}.
 The resulting holdout set has a average coverage above 25\% (Figure~\ref{fig:material-training-holdout-set-distribution}) and an ``out-of-domain'' ratio in average of 83.93\% (Figure~\ref{fig:material-out-domain-holdout}). 
@@ -368,7 +392,7 @@ The resulting holdout set has a average coverage above 25\% (Figure~\ref{fig:mat
 \label{fig:material-out-domain-holdout}
 \end{figure}
 
-\subparagraph{Evaluation}
+\subparagraph*{Evaluation}
 
 The results shown in Table~\ref{tab:evaluation-10fold-material-parser} indicate that Scibert obtains the best results, with F1 at 84.15\%.
 We confirm for this model that features can be ignored with the BidLSTM\_CRF architecture, they improve the results by less than 1\% (from 83.13 to 83.76\%). 
@@ -536,7 +560,7 @@ We perform the E2EE on the 500-papers dataset where we manually examine the resu
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\textwidth]{error-types-3.png}
+\includegraphics[width=\textwidth]{error-types-colors}
 \caption{\textit{Error types} in the context of the data flow. }
 \label{fig:error-types}
 \end{figure}
@@ -614,8 +638,10 @@ Currently SuperCon\textsuperscript{2} contains 40324 records including 2052 trip
 % The schema contains additional information which are described in Table~\ref{tab:superconductors-parser-entities} and~\ref{tab:material-parser-entities} and richer bibliographic data described in Section~\ref{subsubsec:document-structuring}. 
 The schema of SuperCon\textsuperscript{2} is summarised with examples in Table~\ref{tab:supercon2-schema}. 
 
+
 \afterpage {
     \clearpage % Flush earlier floats (otherwise order might not be correct)
+%    \begin{landscape}
     
 \begin{table}[ht]
 \centering\small
@@ -638,7 +664,7 @@ Shape  & The shape of the material or the sample & {Single crystal, polycrystal,
 \hline[dotted]
 Variables  & Variables that can be substituted in the formula & x = 0, RE=Ln,St\\
 \hline[dotted]
-Class  &&\\
+Class  && material classification according to the domain-experts taxonomy & cuprates, oxides, alloys\\
 \hline[dotted]
 Fabrication  & {All the information that does not\\ belong to any of the previous tags} &  {Intercalated,\\ synthesized by MBE method,\\ electron-doped, hole-doped} \\
 \hline[dotted]
@@ -658,18 +684,20 @@ Section & The main body section of the paper & Header, body, annex\\
 \hline[dotted]
 Subsection & The secondary segmentation area of the paper & {Paragraph, table caption,\\ figure caption, title, abstract} \\
 \hline[dotted]
-{Authors,\\ Title, DOI,\\ Publisher,\\ Journal, Year} & \multicolumn{2}{c}{The respective bibliographic information}\\
+{Authors,\\ Title, DOI,\\ Publisher,\\ Journal, Year} & \multicolumn{2}{c}{Bibliographic information of the document}\\
 \hline[dashed]
 \multicolumn{3}{c}{\emph{Internal information}} \\
 \hline[dashed]
-{Hash,\\ Timestamp} & \multicolumn{2}{c}{The Hash of the binary content of the original PDF and the timestamp of the upload.}\\
+{Hash,\\ Timestamp} & \multicolumn{2}{c}{Hash calculated on the binary content of the original PDF document and the timestamp when the document was processed.}\\
 \hline[1pt]
 \end{tblr}
 }
 \caption{\label{tab:supercon2-schema} Summary and description of the SuperCon\textsuperscript{2} schema. \textit{Internal information} are technical information not accessible to the users.}
 \end{table}
     \clearpage 
+%    \end{landscape}
 }
+
 
 The data is ingested through the asynchronous Map-Reduce approach~\cite{10.1145/1327452.1327492}. 
 The ``Extraction task'' processes the PDF documents with \textit{grobid-superconductors} and stores their processed representation together with the original PDF document.
@@ -696,7 +724,7 @@ Users can search in the synthesised tabular data, access the PDF document enrich
 \begin{figure}[ht]
 \centering
 \includegraphics[width=0.8\textwidth]{sample-pdf-annotations}
-\caption{\label{fig:pdf-annotations} Example of superconductors research PDF document~\cite{sample_superconductors_article} enriched with extracted annotations. Materials information (class, formula) and properties (\tc) are summarised in the information box when clicking to the highlighted annotated entity in the text. }
+\caption{\label{fig:pdf-annotations} Example of superconductors research PDF document~\cite{sample_superconductors_article} enriched with extracted annotations. Materials information (class, formula) and properties (\tc) are summarised in the information box when clicking to the highlighted annotated entity in the text.}
 \end{figure}
 
 \section{Conclusion}
@@ -712,17 +740,26 @@ In future, we plan to improve our tools by a) extracting more properties, such a
 We confirmed the good generalisation ability of the Scibert architecture for NER task in materials science domain. 
 There are hopes to obtain better results using materials science pre-trained BERT, such as matscibert~\cite{gupta_matscibert_2022}, however, the gain might be just minimal for relatively larger models~\cite{hong2022ScholarBERT}.
 
-\section{Acknowledgement}
+\section*{Acknowledgement}
 \label{sec:acknowledgement}
-Our warmest thanks to Patrice Lopez, the author of Grobid (\url{https://github.com/kermitt2/grobid}), DeLFT (\url{https://github.com/kermitt2/delft}) and other interesting TDM open-source projects.
+Our warmest thanks to Patrice Lopez, the author of Grobid~\cite{GROBID}, DeLFT~\citep{DeLFT} and many other interesting open-source projects.
+
+%\section*{Notes on contributors}
+% for later 
+
+
+\section*{Competing interests} 
+
+The authors declare no competing interests.
+
 
 \bibliography{bibliography}
-\bibliographystyle{unsrt}
+\bibliographystyle{tfnlm}
 
 % \begin{appendices}
 \appendix
 
-\section{Additional material}
+\section{Dataset additional information}
 
 \begin{table}[ht]
 \centering\small
@@ -804,6 +841,8 @@ label & \textbf{training}  & \textbf{holdout} & \textbf{holdout/training }     \
 \end{table}
 
 
+\section{Machine learning support material}
+
 \begin{table}[ht]
 \centering\small
 \scalebox{0.71}{
@@ -827,7 +866,7 @@ label & \textbf{training}  & \textbf{holdout} & \textbf{holdout/training }     \
 \textbf{20} & Font style: standard (BASELINE), superscript (SUPERSCRIPT) or subscript (SUBSCRIPT) & superconductors & all\\
 \textbf{21} & (boolean) if the token style is bold  & superconductors & all\\
 \textbf{22} & (boolean) if the token style is italic & superconductors & all\\
-\textbf{23} & (boolean) the token is identified as a chemical compound by ChemDataExtractor\cite{chemdataextractor1}  & superconductors & all\\
+\textbf{23} & (boolean) the token is identified as a chemical compound by ChemDataExtractor\cite{chemdataextractor}  & superconductors & all\\
 \bottomrule
 \end{tabular}
 }
