@@ -633,6 +633,12 @@ Finally, ``Extraction'' issues originate mainly from: a) implicit mention of the
 
 \section{Supercon\textsuperscript{2}}
 
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=0.8\textwidth]{sample-pdf-annotations}
+\caption{\label{fig:pdf-annotations} Example of superconductors research PDF document~\cite{sample_superconductors_article} enriched with extracted annotations. Materials information (class, formula) and properties (\tc) are summarised in the information box when clicking to the highlighted annotated entity in the text.}
+\end{figure}
+
 We created SuperCon\textsuperscript{2} by processing 37770 research papers belonging to the category \textit{cond-mat.supr-cond} in ArXiv. 
 Currently SuperCon\textsuperscript{2} contains 40324 records including 2052 triplets \textit{material-Tc-applied pressure}, and 3602 records with explicit measurement method \textit{material-Tc-measurement method}.
 % The schema contains additional information which are described in Table~\ref{tab:superconductors-parser-entities} and~\ref{tab:material-parser-entities} and richer bibliographic data described in Section~\ref{subsubsec:document-structuring}. 
@@ -718,12 +724,6 @@ The pipeline uses a persistence layer for storage and reporting (logger) accessi
 % Although the automatic system might achieve good results and extract a large quantity of data, we are aware that some sort of ``user validation'' is required for improving the data quality. For this reason we have built SuperCon\textsubscript{2} with in mind the needs of an efficient curation interface. 
 We built a visualisation interface to exploit the extracted information. 
 Users can search in the synthesised tabular data, access the PDF document enriched with the extracted information (Figure~\ref{fig:pdf-annotations}), and export locally in CSV, TSV and Microsoft Excel formats. 
-
-\begin{figure}[ht!]
-\centering
-\includegraphics[width=0.8\textwidth]{sample-pdf-annotations}
-\caption{\label{fig:pdf-annotations} Example of superconductors research PDF document~\cite{sample_superconductors_article} enriched with extracted annotations. Materials information (class, formula) and properties (\tc) are summarised in the information box when clicking to the highlighted annotated entity in the text.}
-\end{figure}
 
 \section{Conclusion}
 \label{sec:conclusion}
