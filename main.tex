@@ -215,24 +215,19 @@ Overlapping entities are merged: exact duplicates are removed and the largest en
 The resulting entities are summarised in Table~\ref{tab:superconductors-parser-entities}.
 
 \begin{table}[ht]
-    \centering\small
-    \scalebox{0.71}{
-        \begin{tabular}{m{19em} m{30em}}
-            \toprule
-            \textbf{Entity} (\textbf{Tag})              & \textbf{Description}                                                                                                                                           \\
-            \midrule
-            \multicolumn{2}{c}{\textbf{Machine learning}}                                                                                                                                                                \\
-            \midrule
-            Material (\texttt{<material>})              & Materials and samples names, formulas, including stochiometric formulas, substitution variables of values and elements, shape, doping, substrate               \\
-            Class (\texttt{<class>})                    & Groups of materials having similar characteristics or common strategic compounds that define their nature                                                      \\
-            T\textit{c} value (\texttt{<tcValue>})      & The value of the superconductors critical temperature                                                                                                          \\
-            T\textit{c} expressions (\texttt{<tc>})     & Expressions in the text that provide information about the phenomenon of superconductivity related to a value, interval or variation of the T\textsubscript{c} \\
-            Measurement methods (\texttt{<me\_method>}) & Techniques used to measure or calculate the presence of superconductivity.                                                                                     \\
-            Applied pressure (\texttt{<pressure>})      & Applied pressure when superconductivity is recorded                                                                                                            \\
-            \bottomrule
-        \end{tabular}
-    }
-    \caption{Synthesis of the superconductors parser entities. }
+    \tbl{Synthesis of the superconductors parser entities.}
+    {\begin{tabular}{m{19em} m{30em}}
+        \toprule
+        \textbf{Entity} (\textbf{Tag})              & \textbf{Description} \\
+        \midrule
+        Material (\texttt{<material>})              & Materials and samples names, formulas, including stochiometric formulas, substitution variables of values and elements, shape, doping, substrate               \\
+        Class (\texttt{<class>})                    & Groups of materials having similar characteristics or common strategic compounds that define their nature                                                      \\
+        T\textit{c} value (\texttt{<tcValue>})      & The value of the superconductors critical temperature                                                                                                          \\
+        T\textit{c} expressions (\texttt{<tc>})     & Expressions in the text that provide information about the phenomenon of superconductivity related to a value, interval or variation of the T\textsubscript{c} \\
+        Measurement methods (\texttt{<me\_method>}) & Techniques used to measure or calculate the presence of superconductivity.                                                                                     \\
+        Applied pressure (\texttt{<pressure>})      & Applied pressure when superconductivity is recorded                                                                                                            \\
+        \bottomrule
+    \end{tabular}}
     \label{tab:superconductors-parser-entities}
 \end{table}
 
@@ -247,8 +242,8 @@ Then, we apply different processes, based on which information is available:
 \end{itemize}
 
 \begin{table}[ht]
-    \centering
-    \scalebox{0.7}{
+    \tbl{Synthesis of the material parser extracted entities. }
+    {
         \begin{tabular}{m{16em} m{30em}}
             \toprule
             \textbf{Entity} (\textbf{Tag})               & \textbf{Description}                                                                                                              \\
@@ -264,7 +259,7 @@ Then, we apply different processes, based on which information is available:
             \bottomrule
         \end{tabular}
     }
-    \caption{\label{tab:material-parser-entities} Synthesis of the material parser entities. }
+    \label{tab:material-parser-entities}
 \end{table}
 
 Finally, after all entities are extracted, the post-processing aggregates different mentions of the same materials using the parsed formulas at document-level.
@@ -346,8 +341,10 @@ Unfortunately, we cannot check whether ``above 100K'' or ``W-C nanowire'' are al
 \end{figure}
 
 \begin{table}[ht]
-    \centering\small
-    \scalebox{0.66}{
+    % \centering\small
+    \tbl{Evaluation scores for the superconductor ML model in the four architectures. For DL architecture the results are average over 5 runs. Support (Supp) indicate the number of labels in the training data. }
+    {
+    \scalebox{0.8}{
         \begin{tabular}{l ccc ccc ccc ccc r}
             \toprule
             \textbf{Label}        & \multicolumn{3}{c}{\textbf{CRF}} & \multicolumn{3}{c}{\textbf{BidLSTM\_CRF}} & \multicolumn{3}{c}{\makecell{\textbf{BidLSTM\_CRF}                                                                                                                                                 \\\textbf{\_FEATURES}}} & \multicolumn{3}{c}{\textbf{Scibert}} & \textbf{Supp} \\
@@ -365,7 +362,8 @@ Unfortunately, we cannot check whether ``above 100K'' or ``W-C nanowire'' are al
             \bottomrule
         \end{tabular}
     }
-    \caption{\label{tab:evaluation-superconductors-ML-model} Evaluation scores for the superconductor ML model in the four architectures. For DL architecture the results are average over 5 runs. Support (Supp) indicate the number of labels in the training data. }
+    }
+    \label{tab:evaluation-superconductors-ML-model}
 \end{table}
 
 \paragraph*{Material ML model}
@@ -401,7 +399,9 @@ This suggests to split \texttt{<fabrication>} into separate and more homogeneous
 
 \begin{table}[ht]
     \centering\small
-    \scalebox{0.66}{
+    \tbl{Evaluation scores of the material ML model with holdout set. }
+    {
+        \scalebox{0.8}{
         \begin{tabular}{l ccc ccc ccc ccc r}
             \toprule
             \textbf{Label}         & \multicolumn{3}{c}{\textbf{CRF}} & \multicolumn{3}{c}{\textbf{BidLSTM\_CRF}} & \multicolumn{3}{c}{\makecell{\textbf{BidLSTM\_CRF}                                                                                                                                                 \\\textbf{\_FEATURES}}} & \multicolumn{3}{c}{\textbf{SciBERT}} & \textbf{Supp}  \\
@@ -421,7 +421,8 @@ This suggests to split \texttt{<fabrication>} into separate and more homogeneous
             \bottomrule
         \end{tabular}
     }
-    \caption{\label{tab:evaluation-10fold-material-parser} Evaluation scores of the material ML model with holdout set. }
+    }
+    \label{tab:evaluation-10fold-material-parser}
 \end{table}
 
 \subsection{Entity Linking}
@@ -484,20 +485,22 @@ Each task aims evaluating the linking between two entities types, assuming a 100
 The result of the \texttt{material-tcValue} indicates F1 score around 80\% with a precision of 88.40\%.
 
 \begin{table}[ht]
-    \centering\small
-    \begin{tabular}{lcccc}
-        \toprule
-        \textbf{Link type}          & \textbf{Precision} & \textbf{Recall} & \textbf{F1-score} & Support \\
-        \midrule
-        \textbf{material-tcValue}   & 88.40              & 74.52           & 80.87             & 726     \\
-        \textbf{tcValue-pressure}   & 85.71              & 71.52           & 77.98             & 118     \\
-        \textbf{me\_method-tcValue} & 62.28              & 65.74           & 63.96             & 151     \\
-        % \textbf{material-\tc} (CRF)    & 68.52 &	70.11   &  69.16  &  \\
-        % \textbf{\tc-pressure} (CRF)    & 72.92 &	67.67   &  69.76  &  \\
-        % \textbf{\tc-me.method} (CRF)   & 49.99 &	45.21   &  44.65  & \\
-        \bottomrule
-    \end{tabular}
-    \caption{\label{table:evaluation-linking} Evaluation scores for the Linking. }
+    \centering
+    \tbl{Evaluation scores for the Linking. }{
+        \begin{tabular}{lcccc}
+            \toprule
+            \textbf{Link type}          & \textbf{Precision} & \textbf{Recall} & \textbf{F1-score} & Support \\
+            \midrule
+            \textbf{material-tcValue}   & 88.40              & 74.52           & 80.87             & 726     \\
+            \textbf{tcValue-pressure}   & 85.71              & 71.52           & 77.98             & 118     \\
+            \textbf{me\_method-tcValue} & 62.28              & 65.74           & 63.96             & 151     \\
+            % \textbf{material-\tc} (CRF)    & 68.52 &	70.11   &  69.16  &  \\
+            % \textbf{\tc-pressure} (CRF)    & 72.92 &	67.67   &  69.76  &  \\
+            % \textbf{\tc-me.method} (CRF)   & 49.99 &	45.21   &  44.65  & \\
+            \bottomrule
+        \end{tabular}
+    }
+    \label{table:evaluation-linking}
 \end{table}
 
 % \subsubsection{Sequence labelling linking} 
@@ -575,24 +578,25 @@ Excluding these two subsections will not impact the amount of text, because both
 
 
 \begin{table}[ht]
-    \centering\small
-    \begin{tabular}{l c c}
-        \toprule
-        \textbf{Subsection}                                      & \textbf{Precision} & \textbf{Support} \\
-        \midrule
-        Title                                                    & 100                & 2                \\
-        Abstract                                                 & 80.32              & 61               \\
-        Paragraph                                                & 75.2               & 623              \\
-        Figure captions                                          & 59.28              & 140              \\
-        Unknown                                                  & 57.14              & 21               \\
-        \midrule
-        \textbf{Micro avg.}                                      & 72.60              & 847              \\
-        \textbf{Micro avg.} (excl. figures)                      & 75.24              & 707              \\
-        \textbf{Micro avg.} (excl. unknown sections)             & 73.00              & 603              \\
-        \textbf{Micro avg.} (excl. figures and unknown sections) & 79.14              & 657              \\
-        \bottomrule
-    \end{tabular}
-    \caption{Evaluation end to end: summary of the scores. }
+    \centering
+    \tbl{Evaluation end to end: summary of the scores. }{
+        \begin{tabular}{l c c}
+            \toprule
+            \textbf{Subsection}                                      & \textbf{Precision} & \textbf{Support} \\
+            \midrule
+            Title                                                    & 100                & 2                \\
+            Abstract                                                 & 80.32              & 61               \\
+            Paragraph                                                & 75.2               & 623              \\
+            Figure captions                                          & 59.28              & 140              \\
+            Unknown                                                  & 57.14              & 21               \\
+            \midrule
+            \textbf{Micro avg.}                                      & 72.60              & 847              \\
+            \textbf{Micro avg.} (excl. figures)                      & 75.24              & 707              \\
+            \textbf{Micro avg.} (excl. unknown sections)             & 73.00              & 603              \\
+            \textbf{Micro avg.} (excl. figures and unknown sections) & 79.14              & 657              \\
+            \bottomrule
+        \end{tabular}
+    }
     \label{table:end2end-evaluation-summary}
 \end{table}
 
@@ -649,8 +653,9 @@ The schema of SuperCon\textsuperscript{2} is summarised with examples in Table~\
     \clearpage % Flush earlier floats (otherwise order might not be correct)
 
     \begin{table}[ht]
-        \centering\small
-        \scalebox{0.8}{
+        \centering
+        \tbl{Summary and description of the SuperCon\textsuperscript{2} schema. \textit{Internal information} are technical information not accessible to the users.}{
+        % \scalebox{0.8}{
             \begin{tblr}{Q[l,m]Q[r,m]Q[r,m]}
                 \hline[1pt]
                 \textbf{Field name} & \textbf{Description}                             & \textbf{Examples}             \\
@@ -696,8 +701,9 @@ The schema of SuperCon\textsuperscript{2} is summarised with examples in Table~\
                 {Hash,                                                                                                 \\ Timestamp} & \multicolumn{2}{c}{Hash calculated on the binary content of the original PDF\\ document and the timestamp when the document was processed.}\\
                 \hline[1pt]
             \end{tblr}
+        % }
         }
-        \caption{\label{tab:supercon2-schema} Summary and description of the SuperCon\textsuperscript{2} schema. \textit{Internal information} are technical information not accessible to the users.}
+        \label{tab:supercon2-schema}
     \end{table}
     \clearpage
 }
@@ -764,26 +770,28 @@ The authors declare no competing interests.
 \section{Dataset additional information}
 
 \begin{table}[ht]
-    \centering\small
-    \begin{tabular}{lccc}
-        \toprule
-                                      & \textbf{training} & \textbf{holdout} & \textbf{holdout/training} \\
-        \midrule
-        \textbf{\# documents}         & 132               & 32               & 24.24\%                   \\
-        \textbf{\# examples}          & 16902             & 3905             & 23.10\%                   \\
-        \textbf{\# entities}          & 15586             & 3112             & 19.97\%                   \\
-        \textbf{\# unique entities}   & 6699              & 1372             & 20.48\%                   \\
-        \textbf{\# positive examples} & 8380              & 1776             & 21.19\%                   \\
-        \textbf{\# negative examples} & 8522              & 2129             & 24.98\%                   \\
-        \bottomrule
-    \end{tabular}
-
-    \caption{Holdout/Training set distribution between training and holdout sets for the \textit{superconductors ML model}. \textit{\# positive examples} indicate the number of sentences with at least one entity, and \textit{\# negative examples} the number of sentences with no entities.}
+    \centering
+    \tbl{Holdout/Training set distribution between training and holdout sets for the \textit{superconductors ML model}. \textit{\# positive examples} indicate the number of sentences with at least one entity, and \textit{\# negative examples} the number of sentences with no entities.}
+    {
+        \begin{tabular}{lccc}
+            \toprule
+                                          & \textbf{training} & \textbf{holdout} & \textbf{holdout/training} \\
+            \midrule
+            \textbf{\# documents}         & 132               & 32               & 24.24\%                   \\
+            \textbf{\# examples}          & 16902             & 3905             & 23.10\%                   \\
+            \textbf{\# entities}          & 15586             & 3112             & 19.97\%                   \\
+            \textbf{\# unique entities}   & 6699              & 1372             & 20.48\%                   \\
+            \textbf{\# positive examples} & 8380              & 1776             & 21.19\%                   \\
+            \textbf{\# negative examples} & 8522              & 2129             & 24.98\%                   \\
+            \bottomrule
+        \end{tabular}
+    }
     \label{tab:training-holdout-set-distribution-annex}
 \end{table}
 
 \begin{table}[ht]
-    \centering\small
+    \centering
+    \tbl{Holdout/Training set distribution between training and holdout sets on different labels for the \textit{superconductors ML model}.}{
     \begin{tabular}{lccc}
         \toprule
         label                 & \textbf{training} & \textbf{holdout} & \textbf{holdout/training } \\
@@ -796,29 +804,29 @@ The authors declare no competing interests.
         \texttt{<pressure>}   & 274               & 41               & 14.96\%                    \\
         \bottomrule
     \end{tabular}
-
-    \caption{Holdout/Training set distribution between training and holdout sets on different labels for the \textit{superconductors ML model}.}
+    }
     \label{tab:training-holdout-labels-distribution-annex}
 \end{table}
 
 \begin{table}[ht]
-    \centering\small
-    \begin{tabular}{lccc}
-        \toprule
-                                    & \textbf{training} & \textbf{holdout} & \textbf{holdout/training} \\
-        \midrule
-        \textbf{\# examples}        & 13648             & 5728             & 41.97\%                   \\
-        \textbf{\# entities}        & 4512              & 2817             & 62.43\%                   \\
-        \textbf{\# unique entities} & 9268              & 3292             & 35.52\%                   \\
-        \bottomrule
-    \end{tabular}
-
-    \caption{Holdout/Training set distribution training and holdout sets for the \textit{material ML model}.}
+    \centering
+    \tbl{Holdout/Training set distribution training and holdout sets for the \textit{material ML model}.}{
+        \begin{tabular}{lccc}
+            \toprule
+                                        & \textbf{training} & \textbf{holdout} & \textbf{holdout/training} \\
+            \midrule
+            \textbf{\# examples}        & 13648             & 5728             & 41.97\%                   \\
+            \textbf{\# entities}        & 4512              & 2817             & 62.43\%                   \\
+            \textbf{\# unique entities} & 9268              & 3292             & 35.52\%                   \\
+            \bottomrule
+        \end{tabular}
+    }
     \label{tab:training-holdout-set-material-distribution-annex}
 \end{table}
 
 \begin{table}[ht]
-    \centering\small
+    \centering
+    \tbl{Holdout/Training set distribution training and holdout sets on different labels for the \textit{material ML model}.}{
     \begin{tabular}{lccc}
         \toprule
         label                  & \textbf{training} & \textbf{holdout} & \textbf{holdout/training } \\
@@ -833,8 +841,7 @@ The authors declare no competing interests.
         \texttt{<doping>}      & 792               & 265              & 33.46\%                    \\
         \bottomrule
     \end{tabular}
-
-    \caption{Holdout/Training set distribution training and holdout sets on different labels for the \textit{material ML model}.}
+    }
     \label{tab:training-holdout-labels-material-distribution-annex}
 \end{table}
 
@@ -842,8 +849,9 @@ The authors declare no competing interests.
 \section{Machine learning support material}
 
 \begin{table}[ht]
-    \centering\small
-    \scalebox{0.71}{
+    \centering
+    \tbl{Summary of the features used in the \textit{superconductors} and \textit{material} ML models. \textit{All} under Architecture indicate only BidLSTM\_CRF\_FEATURES and CRF.}{
+    % \scalebox{0.8}{
         \begin{tabular}{l m{30em} c c}
             \toprule
             \textbf{\#}   & \textbf{Feature}                                                                                                                                                                                                                                         & \textbf{Model}  & \textbf{Architecture} \\
@@ -867,8 +875,8 @@ The authors declare no competing interests.
             \textbf{23}   & (boolean) the token is identified as a chemical compound by ChemDataExtractor\cite{chemdataextractor}                                                                                                                                                    & superconductors & all                   \\
             \bottomrule
         \end{tabular}
+    % }
     }
-    \caption{Summary of the features used in the \textit{superconductors} and \textit{material} ML models. \textit{All} under Architecture indicate only BidLSTM\_CRF\_FEATURES and CRF.}
     \label{tab:ML-model-features}
 \end{table}
 
