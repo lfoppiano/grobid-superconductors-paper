@@ -155,16 +155,19 @@ As indicated in Table~\ref{tab:comparison-evaluation-sentences-paragraphs}, the 
 % Our intuition suggests that this improvement can be mainly explained by the increase in the number of training examples for the same amount of text.
 
 \begin{table}[ht]
-    \centering\small
-    \begin{tabular}{lrrr}
-        \toprule
-        \textbf{Label}             & \textbf{Precision} & \textbf{Recall} & \textbf{F1} \\
-        \midrule
-        Paragraph-based micro avg. & 44.44              & 27.21           & 33.76       \\
-        Sentence-based micro avg.  & 48.41              & 50.00           & 51.70       \\
-        \bottomrule
-    \end{tabular}
-    \caption{\label{tab:comparison-evaluation-sentences-paragraphs} Results from cross-validation using sentence-based or paragraphs based.  }
+    \centering
+    \tbl{Results from cross-validation using sentence-based or paragraphs based.  }
+    {
+        \begin{tabular}{lrrr}
+            \toprule
+            \textbf{Label}             & \textbf{Precision} & \textbf{Recall} & \textbf{F1} \\
+            \midrule
+            Paragraph-based micro avg. & 44.44              & 27.21           & 33.76       \\
+            Sentence-based micro avg.  & 48.41              & 50.00           & 51.70       \\
+            \bottomrule
+        \end{tabular}
+    }
+    \label{tab:comparison-evaluation-sentences-paragraphs}
 \end{table}
 
 In the Linking task we want to maximise precision.
