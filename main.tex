@@ -408,12 +408,6 @@ Finally, ``Extraction'' issues mainly originate from: 1) implicit mention of the
 
 \section{Supercon\textsuperscript{2}}
 
-\begin{figure}[ht!]
-    \centering
-    \includegraphics[width=0.8\textwidth]{sample-pdf-annotations}
-    \caption{\label{fig:pdf-annotations} Example of a superconductors research PDF document~\cite{sample_superconductors_article} enriched with extracted annotations. Materials information (class, formula) and properties (\tc) are summarised in the information box when the users click on the highlighted annotated entity in the text.}
-\end{figure}
-
 We created SuperCon\textsuperscript{2} by processing 37770 research papers belonging to the category \textit{cond-mat.supr-cond} in ArXiv.
 Currently SuperCon\textsuperscript{2} contains 40324 records including 2052 triplets with applied pressure (\textit{material-\tc-pressure}), and 3602 records with explicit measurement method (\textit{material-\tc-measurement method}).
 % The schema contains additional information which are described in Table~\ref{tab:superconductors-parser-entities} and~\ref{tab:material-parser-entities} and richer bibliographic data described in Section~\ref{subsubsec:document-structuring}. 
@@ -564,7 +558,7 @@ The authors declare no competing interests.
 \begin{figure}[ht]
     \centering
     \includegraphics[width=\textwidth]{example-comparison-archs.png}
-    \caption{Examples taken from two sources~\cite{Gajda_2016, Shibata_2016} of results from three different architectures: CRF, BidLSTM\_CRF and, Scibert. The boxes annotating the text represent the extracted entities (material with light blue, \tc with green, and \tc expressions with yellow)}.
+    \caption{Examples taken from two sources~\cite{Gajda_2016, Shibata_2016} of results from three different architectures: CRF, BidLSTM\_CRF and, Scibert. The boxes annotating the text represent the extracted entities (material with light blue, \tc with green, and \tc expressions with yellow).}
     \label{fig:example-comparison-architectures}
 \end{figure}
 
@@ -604,7 +598,7 @@ The authors declare no competing interests.
 \begin{figure}[ht]
     \centering
     \includegraphics[width=0.6\textwidth]{material-out-domain-holdout-unique}
-    \caption{Holdout ``out-of-domain'' rates for the Material ML model. The entities from the holdout set that are also in the training set are the in-domain, and the entities that are not in the training set are the out-of-domain}
+    \caption{Holdout ``out-of-domain'' rates for the Material ML model. The entities from the holdout set that are also in the training set are the in-domain, and the entities that are not in the training set are the out-of-domain.}
     \label{fig:material-out-domain-holdout}
 \end{figure}
 
@@ -751,6 +745,12 @@ The authors declare no competing interests.
     \clearpage
 }
 
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{sample-pdf-annotations}
+    \caption{\label{fig:pdf-annotations} Example of a superconductors research PDF document~\cite{sample_superconductors_article} enriched with extracted annotations. Materials information (class, formula) and properties (\tc) are summarised in the information box when the users click on the highlighted annotated entity in the text.}
+\end{figure}
+
 
 \clearpage
 
@@ -759,7 +759,7 @@ The authors declare no competing interests.
 
 \section{Additional information}
 
-\begin{table}[ht]!
+\begin{table}[ht]
     \centering
     \tbl{Holdout/Training set distribution (\%) between training and holdout sets for the Superconductor ML model. Positive examples indicate the number of sentences with at least one entity, and negative examples the number of sentences with no entities.}
     {
@@ -779,7 +779,7 @@ The authors declare no competing interests.
     \label{tab:training-holdout-set-distribution-annex}
 \end{table}
 
-\begin{table}[ht]!
+\begin{table}[ht]
     \centering
     \tbl{Holdout/Training set distribution (\%) between training and holdout sets on different labels for the Superconductors ML model.}{
     \begin{tabular}{lccc}
@@ -798,7 +798,7 @@ The authors declare no competing interests.
     \label{tab:training-holdout-labels-distribution-annex}
 \end{table}
 
-\begin{table}[ht]!
+\begin{table}[ht]
     \centering
     \tbl{Holdout/Training set distribution (\%) training and holdout sets for the Material ML model.}{
         \begin{tabular}{lccc}
@@ -814,7 +814,7 @@ The authors declare no competing interests.
     \label{tab:training-holdout-set-material-distribution-annex}
 \end{table}
 
-\begin{table}[ht]!
+\begin{table}[ht]
     \centering
     \tbl{Holdout/Training set distribution (\%) training and holdout sets on different labels for the Material ML model.}{
     \begin{tabular}{lccc}
@@ -836,7 +836,7 @@ The authors declare no competing interests.
 \end{table}
 
 
-\begin{table}[ht]!
+\begin{table}[ht]
     \centering
     \tbl{Summary of the features used in the \textit{superconductors} and \textit{material} ML models. \textit{All} under Architecture indicate only BidLSTM\_CRF\_FEATURES and CRF.}{
     % \scalebox{0.8}{
