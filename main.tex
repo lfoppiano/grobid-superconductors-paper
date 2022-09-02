@@ -99,7 +99,7 @@ Considering the cost of database construction, it is necessary to consider an as
 As a solution, we are developing a hybrid data extraction method from scientific literature that combines automation using text data mining and manual curation.
 The automated system extracts and formats potential data and proposes them to the curator as ``pre-cooked'' structured data by (1) highlighting the relevant entities on the original document and (2) pre-filling the extracted information in a tabular format.
 % By linking (a) highlighted source text and (b) structured information, curators can quickly move back and forth between (a) and (b). 
-In building the automated part of this hybrid system (training, evaluation) we used SuperMat~\cite{foppiano2021supermat}, which we recently constructed.
+In building the automated part of this hybrid system (training, evaluation) we used SuperMat, an annotated linked dataset from scholarly documents in superconductor research, which we recently constructed~\cite{foppiano2021supermat}.
 % This is a dataset linked to data annotated against the full text of the scientific literature on superconductivity research. 
 % We used SuperMat not only as training data for machine learning, but also for NLP evaluation.
 
@@ -113,7 +113,7 @@ Grobid provides several built-in features including access to PDF document layou
 Using Grobid-superconductors and other sub-tools, we established a pipeline to process a large number of documents and obtain an automated database of superconductor materials and properties.
 We processed 37770 papers from ArXiv (\url{https://arxiv.org}) and obtained a database of 40324 records.
 This new database, named SuperCon\textsuperscript{2}, can become an automated staging area for SuperCon, when bridged by a curation interface.
-During the project, there was also an opportunity to focus on properties that gained interest in recent scientific trends and that are underrepresented in SuperCon.
+During the project, there was also an opportunity to focus on properties that that have recently become of greater interest and that are underrepresented in SuperCon.
 For example, the ``pressure'' applied to obtain superconductivity (about 20 records in SuperCon), has gained attention because it can radically change the physical structure of a material.
 In addition, the ``method'' used to measure the superconducting transition temperature \tc~(about 600 records in SuperCon) can be used to semantically recognise multiple \tc 's obtained from the same material or sample (e.g., distinguish calculated and experimental values of \tc).
 
@@ -123,12 +123,6 @@ In addition, the ``method'' used to measure the superconducting transition tempe
 We developed Grobid-superconductors as a Grobid module following principles (multi-step, sentence-based, full-text-based) discussed in a previous preliminary study~\cite{foppiano:hal-02870896}.
 Grobid has several advantages: 1) it can be integrated with pdfalto (\url{https://github.com/kermitt2/pdfalto}), a specialised tool for converting PDF to XML, which mitigates extraction issues such as the resolution of embedded fonts, invalid character encoding, and the reconstruction of the correct reading order, 2) it allows access to PDF document layout information for both machine learning and document decoration (e.g., coordinates in the PDF document); and, 3) it provides access to a set of high-quality, pre-trained machine learning models for structuring documents.
 Grobid-superconductors is structured as a three-steps process illustrated in Figure~\ref{fig:pipeline-overview} and described in the Sections~\ref{subsubsec:document-structuring},~\ref{subsubsec:extraction}, and~\ref{subsubsec:linking}.
-
-\begin{figure}[ht]
-    \includegraphics[width=\textwidth]{schema-architecture-colors}
-    \caption{Processing pipeline for extracting superconductors materials and properties. }
-    \label{fig:pipeline-overview}
-\end{figure}
 
 \paragraph*{Abstract versus full-text}
 At the time of writing this paper, we are aware of related works that utilise text from abstracts as training data for machine learning.
@@ -147,28 +141,11 @@ During training, sentences also use less memory and allow us to train models wit
 %, and c) SciBERT~\cite{Beltagy2019SciBERT} models are pre-trained on sentences while RoBERTa~\cite{roberta} models are pre-trained with splitting paragraphs.
 
 We chose to use sentence-based text in Grobid-superconductors after performing preliminary experiments on our tasks typologies, but on a smaller scale. 
-For the entity extraction task we trained and evaluated a sequence labelling model for each version (paragraph-based and sentence-based) on four annotated documents (3/1 document partition for training/evaluation) from SuperMat~\cite{foppiano2021supermat}.
+For the Named Entities Recognition (NER) task we trained and evaluated a sequence labelling model for each version (paragraph-based and sentence-based) on four annotated documents (3/1 document partition for training/evaluation) from SuperMat~\cite{foppiano2021supermat}.
 As indicated in Table~\ref{tab:comparison-evaluation-sentences-paragraphs}, the F1-score increased by 17.94 percentage points when the sentence-based text was used.
 % Our intuition suggests that this improvement can be mainly explained by the increase in the number of training examples for the same amount of text.
 
-\begin{table}[ht]
-    \centering
-    \tbl{Results from cross-validation for sentence-based and paragraphs-based text.  }
-    {
-        \begin{tabular}{lrrr}
-            \toprule
-            \textbf{Label}             & \textbf{Precision} & \textbf{Recall} & \textbf{F1} \\
-            \midrule
-            Paragraph-based micro avg. & 44.44              & 27.21           & 33.76       \\
-            Sentence-based micro avg.  & 48.41              & 50.00           & 51.70       \\
-            \bottomrule
-        \end{tabular}
-    }
-    \label{tab:comparison-evaluation-sentences-paragraphs}
-\end{table}
-
-
-For the linking step, we want to maximise precision. 
+For the Entity Linking (EL) task, we want to maximise precision. 
 In our previous work~\cite{foppiano2019proposal} we noticed that limiting linking entities within the same sentence (versus paragraph) would obtain higher precision (68.7\% versus 57\%) at the expense of lower recall (6.5\% versus 10.7\%), and F1-score (11.87\% versus 18.01\%).
 Therefore, in both our tasks we found evidence that a sentence-based dataset is more beneficial than paragraph-based dataset.
 
@@ -179,12 +156,6 @@ In the first step of our process, the PDF document is converted into an internal
 The input document is processed using the Grobid original models, where we apply customised processes for document header and content.
 We select a subset of bibliographic information from the header: title, authors, DOI, publisher, journal, and year of publication, and we consolidate them via Grobid to match the publisher's quality (even by processing the ``preprint version'' of the publication).
 The superconductors entities extraction is applied to the content, only on relevant text items: title, abstract, text content from body or annexes, text content from figure and table captions (Figure~\ref{fig:grobid-document-processing}).
-
-\begin{figure}[ht]
-    \includegraphics[width=\textwidth]{document-structuring-colors}
-    \caption{Grobid-superconductors extraction processes (bibliographic information, superconductor entity extraction and sentence segmentation) within the Grobid cascade data flow. In the ''custom process`` in red the ML models, and the rectangles are the extracted information.}
-    \label{fig:grobid-document-processing}
-\end{figure}
 
 We use the collected reference markers (also called \textit{reference callouts}) from the text as features for improving the paragraph segmentation in sentences: the segmentation is cancelled if the end of sentence falls within the boundaries of a reference marker.
 For example, a sentence containing a reference in the form ``Foppiano et. al.'' may be mistakenly segmented in the middle at the token ``et.''.
@@ -197,40 +168,17 @@ For example, a sentence containing a reference in the form ``Foppiano et. al.'' 
 % \end{itemize}
 
 
-\subsection{Entity Extraction}
+\subsection{Named Entity Recognition}
 \label{subsubsec:extraction}
 
-The second step is the Entity Extraction; in this step, the the Named Entity Recognition (NER) task is performed on  the previously extracted text.
+In the second step, the Named Entity Recognition (NER) task is performed on the previously extracted text.
 
-\subsubsection*{Overview}
-
-\begin{figure}[ht]
-    \includegraphics[width=\textwidth]{schema-extraction-colors}
-    \caption{\label{fig:extraction-ml-models-cascade-architecture} Cascade architecture in the Entity Extraction step. The white rectangles indicate the extracted information (described in Tables~\ref{tab:superconductors-parser-entities} and~\ref{tab:material-parser-entities}).
-        The ML models and the rule-based algorithms are identified by light grey and dark grey shapes, respectively.}
-\end{figure}
+\subsubsection{Overview}
 
 As illustrated in Figure~\ref{fig:extraction-ml-models-cascade-architecture} the ``superconductor parser'' extracts the main superconductor-related information by aggregating the resulting entities from two ML models.
 The Superconductors ML model was developed based on the SuperMat schema~\cite{foppiano2021supermat}, and the Quantity ML model was developed in a separated Grobid module for measurement extraction~\cite{foppiano2019quantities} and the output is limited to only temperatures and pressures.
 Overlapping entities are merged, exacted duplicates are removed, and the largest entities (in terms of string length) are preserved.
 The resulting entities are summarised in Table~\ref{tab:superconductors-parser-entities}.
-
-\begin{table}[ht]
-    \tbl{Entities extracted by the superconductors parser.}
-    {\begin{tabular}{m{19em} m{30em}}
-        \toprule
-        \textbf{Entity} (\textbf{tag})              & \textbf{Description} \\
-        \midrule
-        Material (\texttt{<material>})              & Materials and samples names, formulas (including stochiometric formulas), substitution variables of values and elements, shape, doping, and substrate               \\
-        Class (\texttt{<class>})                    & Groups of materials having similar characteristics or common strategic compounds that define their nature                                                      \\
-        \tc value (\texttt{<tcValue>})      & The value of the superconductor critical temperature                                                                                                          \\
-        \tc expressions (\texttt{<tc>})     & Expressions in the text that provide information about the phenomenon of superconductivity related to a value, interval or variation of the \tc \\
-        Measurement method (\texttt{<me\_method>}) & Technique used to measure or calculate the presence of superconductivity                                                                                     \\
-        Applied pressure (\texttt{<pressure>})      & Applied pressure when superconductivity is recorded                                                                                                            \\
-        \bottomrule
-    \end{tabular}}
-    \label{tab:superconductors-parser-entities}
-\end{table}
 
 Entities of type \texttt{<material>}, which may contain mixed heterogeneous information, are passed in the cascade to the ``Material parser'' which aggregates ML and other tools.
 First, the entity is passed through a Material ML model to segment and identify its content (Table~\ref{tab:material-parser-entities}).
@@ -242,31 +190,10 @@ These processes include the following:
     \item Using the variables and values extracted, we substitute them into partial formulas. For example, in \texttt{La 4 Fe 2 A 1-x O 7 (A=Mg,Co; x=0.1,0.2)}, we substitute \textit{A} and \textit{x} using their parsed values, and applying permutations, we obtain four \textit{resolved formulas}: \texttt{La 4 Fe 2 Mg 0.9 O 7}, \texttt{La 4 Fe 2 Mg 0.8 O 7}, \texttt{La 4 Fe 2 Co 0.9 O 7}, and \texttt{La 4 Fe 2 Co 0.8 O 7}.
 \end{itemize}
 
-\begin{table}[ht]
-    \tbl{Entities extracted by the material parser. }
-    {
-        \begin{tabular}{m{16em} m{30em}}
-            \toprule
-            \textbf{Entity} (\textbf{tag})               & \textbf{Description}                                                                                                              \\
-            \midrule
-            Name (\texttt{<name>})                       & The canonical name of a material (e.g., hydrogen, PCCO, carbon)                                                                    \\
-            Formula (\texttt{<formula>})                 & Chemical formula of the material (e.g., \texttt{Pr1.869Ce0.131CuO 4-}, \texttt{MgB2}, \texttt{La 2-x Sr x CuO 4})                  \\
-            Doping (\texttt{<doping>})                   & Doping ratio and doping materials that are adjoined to the material name (e.g., \texttt{Zn-doped}, \texttt{2\% Zn-doped})          \\
-            Shape (\texttt{<shape>})                     & shape of the material (e.g. single crystal, polycrystalline, thin film, powder, film)                                             \\
-            Substitution variables (\texttt{<variable>}) & Variables that can be substituted in the formula.                                                                                 \\
-            Substitution values (\texttt{<value>})       & Values expressed in the doping.                                                                                                   \\
-            Substrate (\texttt{<substrate>})             & Substrates as defined in the material name                                                                                        \\
-            Fabrication (\texttt{<fabrication>})         & Additional information that does not belong to any of the previous tags  (e.g., intercalated, electron-doped) \\
-            \bottomrule
-        \end{tabular}
-    }
-    \label{tab:material-parser-entities}
-\end{table}
-
 Finally, after all entities are extracted, the post-processing aggregates different mentions of the same materials using the parsed formulas at the document-level.
 For example, formula with partial substitutions such as \texttt{La 2 Fe 1-x O 7 (x = 0.1, 0.2)} will be aggregated with materials like \texttt{La 2 Fe 0.9 O 7} appearing in other sections of the same document.
 
-\subsubsection*{Machine Learning study}
+\subsubsection{Machine Learning study}
 
 In this section we discuss the novel ML models we have trained for extracting specialised entities: the Superconductor ML model and the Material ML model (Figure~\ref{fig:extraction-ml-models-cascade-architecture}).
 SuperMat~\cite{foppiano2021supermat}, our training dataset, contains 164 papers as of the time of writing and is composed of annotated full-text and layout features from PDF documents.
@@ -290,27 +217,12 @@ The holdout set ``out-of-domain'' ratio was on average around 72\%, which challe
 Most of the labels had an ``out-of-domain'' ratio above 50\%  (Figure~\ref{fig:out-domain-holdout});  \texttt{<material>}, the most important label, had the highest ratio (82\%) while \texttt{<me\_method>} and \texttt{<pressure>} have the lowest (25\% and 33\%). 
 The low ratio of \texttt{<me\_method>} can be explained by their low entity variability (11.44\%).
 
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=\textwidth]{superconductor-holdout-training-set}
-    \caption{Holdout/training set distribution for (a) general metrics and (b) entity labels; entities and unique entities indicate the number of labelled entities with and without value duplicates, respectively, and positive examples (+) and negative examples (-) indicate the number of sentences with at least one entity and with no entities, respectively.}
-    \label{fig:training-holdout-set-distribution}
-\end{figure}
-
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=0.6\textwidth]{superconductor-out-domain-holdout-unique}
-    \caption{Holdout ``out-of-domain'' rates. The entities from the holdout set that are also in the training set are ``in-domain'' and the entities that are not in the training set are ``out-of-domain''.}
-    \label{fig:out-domain-holdout}
-\end{figure}
-
 \subparagraph*{Positive sampling}
 We trained the model with positive sampling by removing the examples without entities (negative examples, Figure~\ref{fig:training-holdout-set-distribution}a).
 This approach provided an improvement of 2\% in both precision and recall as compared to the result without sampling when testing against the holdout set.
 Additional experiments with active and random sampling~\cite{lopez2021mining} with ratios of negative examples of 0.1, 0.25, 0.5 and 1.0 did not provide stable evidence suggesting scoring improvements when testing against the holdout set. 
 
 \subparagraph*{Evaluation}
-
 The best results were obtained by Scibert with an F1 of 77.03\% and a recall of around 80.69\% (Table~\ref{tab:evaluation-superconductors-ML-model}).
 The features did not provide any improvements with RNN models: BidLSTM\_CRF and BidLSTM\_CRF\_FEATURES resulted in the same F1 score.
 This result comes as a surprise because features such as superscript/subscript were expected to be determinants for recognising material sequences.
@@ -328,39 +240,6 @@ In the training data, ``above 100K'' is not present, but ``below 100K'' and ``\~
 In a second example (Figure~\ref{fig:example-comparison-architectures}b), only Scibert can correctly extract ``W-C nanowire'' which is not present in the SuperMat training data.
 Unfortunately, we cannot check whether ``above 100K'' or ``W-C nanowire'' are also present in the dataset used in the pre-train of SciBERT by their authors~\cite{Beltagy2019SciBERT} because the data are not available.
 
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=\textwidth]{example-comparison-archs.png}
-    \caption{Examples taken from two sources~\cite{Gajda_2016, Shibata_2016} of results from three different architectures: CRF, BidLSTM\_CRF and, Scibert}. The boxes annotating the text represent the extracted entities (material with light blue, \tc with green, and \tc expressions with yellow).
-    \label{fig:example-comparison-architectures}
-\end{figure}
-
-\begin{table}[ht]
-    % \centering\small
-    \tbl{Evaluation scores (\%) for the Superconductor ML model in the four architectures. For the DL architecture the results are averaged over 5 runs. Support (Supp) indicates the number of labels in the training data. Values in bold indicate the highest score. P: precision, R: recall.}
-    {
-    \scalebox{0.8}{
-        \begin{tabular}{l ccc ccc ccc ccc r}
-            \toprule
-            \textbf{Label}        & \multicolumn{3}{c}{\textbf{CRF}} & \multicolumn{3}{c}{\textbf{BidLSTM\_CRF}} & \multicolumn{3}{c}{\makecell{\textbf{BidLSTM\_CRF}                                                                                                                                                 \\\textbf{\_FEATURES}}} & \multicolumn{3}{c}{\textbf{Scibert}} & \textbf{Supp} \\
-            \cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-10}\cmidrule(lr){11-13}\cmidrule(lr){14-14}
-                                  & \textbf{P}                       & \textbf{R}                                & \textbf{F1}                                        & \textbf{P} & \textbf{R} & \textbf{F1}    & \textbf{P}     & \textbf{R} & \textbf{F1}    & \textbf{P} & \textbf{R}     & \textbf{F1}    &      \\
-            \midrule
-            \texttt{<class>}      & 79.74                            & 66.79                                     & 72.69                                              & 79.01      & 72.62      & \textbf{75.66} & 77.84          & 72.40      & 74.97          & 72.95      & 75.28          & 74.09          & 1646 \\
-            \texttt{<material>}   & 79                               & 72.15                                     & 75.42                                              & 79.25      & 76.94      & 78.06          & 81.07          & 75.10      & 77.94          & 80.15      & 81.42          & \textbf{80.77} & 6943 \\
-            \texttt{<me\_method>} & 60.25                            & 68.73                                     & 64.21                                              & 56.41      & 79.49      & 65.92          & 55.86          & 80.45      & 65.90          & 56.26      & 81.52          & \textbf{66.56} & 1883 \\
-            \texttt{<pressure>}   & 46.15                            & 29.27                                     & 35.82                                              & 49.45      & 58.05      & 52.53          & 50.25          & 60.49      & \textbf{54.36} & 41.72      & 52.68          & 46.51          & 274  \\
-            \texttt{<tc>}         & 84.36                            & 83.57                                     & \textbf{83.96}                                     & 78.61      & 82.54      & 80.48          & 79.19          & 82.07      & 80.60          & 74.46      & 82.66          & 78.35          & 3741 \\
-            \texttt{<tcValue>}    & 69.8                             & 66.24                                     & 67.97                                              & 70.36      & 75.16      & 72.67          & 68.95          & 76.56      & 72.52          & 70.90      & 79.74          & \textbf{75.06} & 1099 \\
-            \midrule
-            All (micro avg)       & 76.88                            & 72.77                                     & 74.77                                              & 74.59      & 77.67      & 76.09          & \textbf{75.17} & 76.79      & 75.96          & 73.69      & \textbf{80.69} & \textbf{77.03}        \\
-            \bottomrule
-        \end{tabular}
-    }
-    }
-    \label{tab:evaluation-superconductors-ML-model}
-\end{table}
-
 \paragraph*{Material ML model}
 
 To train the Material ML model we created a special dataset with an additional layer of labels (Table~\ref{tab:material-parser-entities}), which included the material information represented by entities annotated as \texttt{<material>} in the SuperMat documents.
@@ -371,66 +250,24 @@ In this model we created an independent holdout set because the manual annotatio
 We used material data extracted from a dataset of 500 documents (500-papers) from three publishers: \textit{American Institute of Physics} (AIP), \textit{American Physical Society} (APS) and \textit{Institute of Physics} (IOP)~\cite{foppiano2019proposal}.
 The resulting holdout set has a average coverage greater than 25\% (Figure~\ref{fig:material-training-holdout-set-distribution}) and an average ``out-of-domain'' ratio of 83.93\% (Figure~\ref{fig:material-out-domain-holdout}).
 
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=\textwidth]{material-holdout-training-set}
-    \caption{Holdout/training set for the Material ML model: (a) general metrics and (b) entity labels.}
-    \label{fig:material-training-holdout-set-distribution}
-\end{figure}
-
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=0.6\textwidth]{material-out-domain-holdout-unique}
-    \caption{Holdout ``out-of-domain'' rates for the Material ML model. The entities from the holdout set that are also in the training set are the in-domain, and the entities that are not in the training set are the out-of-domain}
-    \label{fig:material-out-domain-holdout}
-\end{figure}
-
 \subparagraph*{Evaluation}
 
 Scibert obtained the best results, with F1 at 84.15\% (Table~\ref{tab:evaluation-10fold-material-parser}).
 The inclusion of features in the BidLSTM\_CRF architecture only improved results by less than 1\% (from 83.13 to 83.76\%).
 The label \texttt{<fabrication>} did not perform well with any architecture, most likely because it is too generic (Table~\ref{tab:material-parser-entities}), and the content is too heterogeneous. Another label, \texttt{<substrate>} has only one-third of the training examples of \texttt{<fabrication>} but obtained results that were three times higher with Scibert, suggesting that \texttt{<fabrication>} should be split into separate and more homogeneous labels.
 
-\begin{table}[ht]
-    \centering\small
-    \tbl{Evaluation scores (\%) of the Material ML model with holdout set. Support (Supp) indicates the number of labels in the training data. Values in bold indicate the highest score. P: precision, R: recall.}
-    {
-        \scalebox{0.8}{
-        \begin{tabular}{l ccc ccc ccc ccc r}
-            \toprule
-            \textbf{Label}         & \multicolumn{3}{c}{\textbf{CRF}} & \multicolumn{3}{c}{\textbf{BidLSTM\_CRF}} & \multicolumn{3}{c}{\makecell{\textbf{BidLSTM\_CRF}                                                                                                                                                 \\\textbf{\_FEATURES}}} & \multicolumn{3}{c}{\textbf{SciBERT}} & \textbf{Supp}  \\
-            \cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-10}\cmidrule(lr){11-13}\cmidrule(lr){14-14}
-                                   & \textbf{P}                       & \textbf{R}                                & \textbf{F1}                                        & \textbf{P} & \textbf{R} & \textbf{F1}    & \textbf{P}     & \textbf{R} & \textbf{F1}    & \textbf{P} & \textbf{R}     & \textbf{F1}    &      \\
-            \midrule
-            \texttt{<doping>}      & 60.41                            & 55.85                                     & 58.04                                              & 67.98      & 62.42      & 64.95          & 69.00          & 62.34      & \textbf{65.43} & 63.58      & 62.79          & 63.16          & 792  \\
-            \texttt{<fabrication>} & 40.00                            & 4.55                                      & 8.16                                               & 23.61      & 5.91       & 9.24           & 37.33          & 9.09       & 14.48          & 22.51      & 13.18          & \textbf{16.52} & 94   \\
-            \texttt{<formula>}     & 80.81                            & 82.29                                     & 81.54                                              & 82.59      & 84.14      & 83.35          & 83.83          & 85.14      & 84.47          & 84.53      & 86.56          & \textbf{85.53} & 6301 \\
-            \texttt{<name>}        & 72.2                             & 63.75                                     & 67.71                                              & 76.29      & 78.76      & 77.43          & 74.51          & 80.38      & 77.33          & 77.18      & 81.86          & \textbf{79.44} & 1930 \\
-            \texttt{<shape>}       & 90.89                            & 92.51                                     & 91.69                                              & 90.93      & 95.79      & \textbf{93.29} & 90.33          & 95.74      & 92.96          & 89.67      & 97.20          & 93.28          & 809  \\
-            \texttt{<substrate>}   & 37.04                            & 6.76                                      & 11.43                                              & 54.31      & 32.43      & 40.44          & 60.08          & 33.38      & 42.82          & 56.32      & 41.22          & \textbf{47.59} & 32   \\
-            \texttt{<value>}       & 80.21                            & 83.15                                     & 81.65                                              & 84.81      & 89.33      & 86.99          & 85.16          & 90.15      & \textbf{87.58} & 83.14      & 85.92          & 84.50          & 1895 \\
-            \texttt{<variable>}    & 96.85                            & 95.98                                     & 96.41                                              & 95.19      & 97.77      & 96.46          & 96.32          & 97.90      & \textbf{97.10} & 96.22      & 96.52          & 96.37          & 1795 \\
-            \midrule
-            All (micro avg)        & 81.15                            & 78.09                                     & 79.59                                              & 82.76      & 83.50      & 83.13          & \textbf{83.20} & 84.33      & 83.76          & 83.11      & \textbf{85.23} & \textbf{84.15} &      \\
-            \bottomrule
-        \end{tabular}
-    }
-    }
-    \label{tab:evaluation-10fold-material-parser}
-\end{table}
-
 \subsection{Entity Linking}
 \label{subsubsec:linking}
 
 %Introduction of the linking
-The ``Linking'' step performs entity linking (EL) between materials and their corresponding properties.
+Entity linking (EL) links materials and their corresponding properties.
 %Objective of the linking
 % We can formalised it as follows. \textit{Given a text T and two or more entities e\textsubscript{1}...e\textsubscript{n} of two types t\textsubscript{1} and t\textsubscript{2}, determine links between entities of type t\textsubscript{1} can be linked to entities of type t\textsubscript{2} .} 
 
 %We have experimented several options: dependency parsing, rule-based, and sequence labelling. 
 We use a rule-based algorithm, but there are other approaches such as the use of dependency parsing~\cite{yoshikawa:2017acl, Tiktinsky2020pyBARTES, swayamdipta:17, zhou-zhao-2019-head}. We did not use these because it was difficult to find a suitable dependency parser for scientific texts, and complementary methods based on complex rule sets were needed to compensate for the poor performance of the parser.
 
-In our algorithm, pairs of entities are linked focusing on three types of relationships:
+In our algorithm, pairs of entities are linked focusing on three types of link:
 \begin{itemize}
     \item \textbf{material-tcValue}: The link between a material and its corresponding \tc.
     \item \textbf{tcValue-pressure}: The link between \tc and its related critical pressure.
@@ -474,28 +311,9 @@ As a result, the \texttt{MgB2} entity is correctly linked to ``\texttt{39 K}''.
 The distance calculation is also adjusted with the addition of ``penalties'' by doubling the calculated distance when certain keywords or punctuations (``,'', ``.'', ``;'', ``and'', ``but', ``while', ``whereas', ``which'', ``although'') appear between two entities because they represent a logical separation of predicates ~\cite{oka2021table}.
 In the above example, the distance between \texttt{39 K} and \texttt{FeSe} would be doubled (\textit{d}=20) and the link would not be made.
 
-This rule-based linking was evaluated using the linked entities from SuperMat~\cite{foppiano2021supermat} (Table~\ref{table:evaluation-linking}) and is divided considering each relationship type.
+This rule-based linking was evaluated using the linked entities from SuperMat~\cite{foppiano2021supermat} (Table~\ref{table:evaluation-linking}) and is divided considering each link type.
 The F1 score for the \texttt{material-tcValue} was about 80\% with a precision of 88.40\%. 
 \texttt{tcValue-pressure} F1 score was 3\% lower than  \texttt{material-tcValue} considering much less data available (support was 118 compared with 726).
-
-\begin{table}[ht]
-    \centering
-    \tbl{Evaluation scores for the Linking. Support (Supp) indicates the number of labels in the training data. Values in bold indicate the highest score. P: precision, R: recall.}{
-        \begin{tabular}{lcccc}
-            \toprule
-            \textbf{Relationship type}          & \textbf{P} & \textbf{R} & \textbf{F1-} & Supp \\
-            \midrule
-            \textbf{material-tcValue}   & 88.40              & 74.52           & 80.87             & 726     \\
-            \textbf{tcValue-pressure}   & 85.71              & 71.52           & 77.98             & 118     \\
-            \textbf{me\_method-tcValue} & 62.28              & 65.74           & 63.96             & 151     \\
-            % \textbf{material-\tc} (CRF)    & 68.52 &	70.11   &  69.16  &  \\
-            % \textbf{\tc-pressure} (CRF)    & 72.92 &	67.67   &  69.76  &  \\
-            % \textbf{\tc-me.method} (CRF)   & 49.99 &	45.21   &  44.65  & \\
-            \bottomrule
-        \end{tabular}
-    }
-    \label{table:evaluation-linking}
-\end{table}
 
 % \subsubsection{Sequence labelling linking} 
 % We designed the linking based on sequence labelling as a simple task where each token can be assigned two labels: \texttt{<link\_left>} or \texttt{<link\_right>}. 
@@ -551,16 +369,9 @@ We performed the E2EE on the ``500-papers'' dataset where we manually examined t
     \item \textbf{From table}: the extracted text is wrongly extracted from a table. Although table content is ignored, the error rate from the Grobid library is still relevant due to the lack of training data.
     \item \textbf{Extraction}: entities are not recognised, wrongly recognised, or partially recognised.
     \item \textbf{Quantity extraction}: quantity entities (pressure, temperature) are not correctly extracted. We measured this error separately to identify the failure that could be shared with the Quantity ML model.
-    \item \textbf{Tc classification}: the temperature is wrongly classified as superconducting \tc.
+    \item \textbf{\tc classification}: the temperature is wrongly classified as superconducting \tc.
     \item \textbf{Linking}: given the initial steps were performed correctly, the resulting entities are not linked correctly.
 \end{itemize}
-
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=\textwidth]{error-types-colors}
-    \caption{\textit{Error types} in the context of the data flow. }
-    \label{fig:error-types}
-\end{figure}
 
 The E2EE scores are summarised in Table~\ref{table:end2end-evaluation-summary}.
 Recall is omitted because it is less relevant and difficult to calculate manually.
@@ -569,41 +380,10 @@ The `unknown` subsections indicate that the extracted text's structure was not w
 The overall score increases to 73\% when excluding unknown subsections, 75.24\% when excluding figure captions, and 79.14\%  when excluding both.
 Excluding these two subsections will not impact the amount of text, because both account for less than 20\% of the total number of subsections.
 
-
-\begin{table}[ht]
-    \centering
-    \tbl{Summary of the E2EE evaluation scores. Support indicates the number of labels in the training data.}{
-        \begin{tabular}{l c c}
-            \toprule
-            \textbf{Subsection}                                      & \textbf{Precision} & \textbf{Support} \\
-            \midrule
-            Title                                                    & 100                & 2                \\
-            Abstract                                                 & 80.32              & 61               \\
-            Paragraph                                                & 75.2               & 623              \\
-            Figure captions                                          & 59.28              & 140              \\
-            Unknown                                                  & 57.14              & 21               \\
-            \midrule
-            \textbf{Micro avg.}                                      & 72.60              & 847              \\
-            \textbf{Micro avg.} (excl. figures)                      & 75.24              & 707              \\
-            \textbf{Micro avg.} (excl. unknown sections)             & 73.00              & 603              \\
-            \textbf{Micro avg.} (excl. figures and unknown sections) & 79.14              & 657              \\
-            \bottomrule
-        \end{tabular}
-    }
-    \label{table:end2end-evaluation-summary}
-\end{table}
-
 The error types are summarised in Figure~\ref{fig:error-types-distribution}. The most common failures  originate from \tc~classification (40\%), Linking (32\%), and Extraction (20\%).
-The most common Tc classification failures are as incorrect recognition of 1) relative values of \tc (e.g., 1 K higher than material X); 2) values indicating the transition temperature width ($\Delta T_{c}$); 3) temperature values that are not \tc, for example, material synthesis temperatures ($T$), other critical transition temperatures that are not superconducting (e.g., $T_{Curie}$); and 4) values of temperature at which there is no superconductivity (e.g., ``at 70 K there is no superconductivity'').
+The most common \tc classification failures are as incorrect recognition of 1) relative values of \tc (e.g., 1 K higher than material X); 2) values indicating the transition temperature width ($\Delta T_{c}$); 3) temperature values that are not \tc, for example, material synthesis temperatures ($T$), other critical transition temperatures that are not superconducting (e.g., $T_{Curie}$); and 4) values of temperature at which there is no superconductivity (e.g., ``at 70 K there is no superconductivity'').
 ``Linking errors'' mainly occur when the text compare relative values of \tc~using materials as the basis for comparison (e.g., ``The Tc = 38 K is similar to the one of MgB$_{2}$'').
 Finally, ``Extraction'' issues mainly originate from: 1) implicit mention of the main material when experimented using different ``substrates'' combination, and 2) mismatches between \texttt{<material>} and \texttt{<class>} which, by definition, overlap.
-
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=\linewidth]{error-types-bars-perc}
-    \caption{Error type distribution in the E2EE of the \textit{500-papers} dataset.}
-    \label{fig:error-types-distribution}
-\end{figure}
 
 % \begin{table}[ht]
 % \centering
@@ -639,6 +419,278 @@ Currently SuperCon\textsuperscript{2} contains 40324 records including 2052 trip
 % The schema contains additional information which are described in Table~\ref{tab:superconductors-parser-entities} and~\ref{tab:material-parser-entities} and richer bibliographic data described in Section~\ref{subsubsec:document-structuring}. 
 The schema of SuperCon\textsuperscript{2} is summarised with examples in Table~\ref{tab:supercon2-schema}.
 
+The data is processed and ingested through the asynchronous Map-Reduce approach~\cite{10.1145/1327452.1327492}.
+The ``extraction task'' (Map) processes the PDF documents by accessing Grobid-superconductors via REST API and stores their processed representation together with the original PDF document.
+Furthermore, the ``aggregation task'' (Reduce) reduces the document information into a synthesised tabular format.
+We store the processed document representation in JSON format. 
+The processed documents are kept separately and used for displaying the enhanced PDF document (Figure~\ref{fig:pdf-annotations}).
+The pipeline uses a persistence layer for storage and reporting (logger)..
+
+% \begin{figure}[ht]
+% \centering
+% \includegraphics[width=0.7\textwidth]{workflow-schema-1}
+% \caption{Schema of the ingestion workflow}
+% \label{fig:ingestion-workflow}
+% \end{figure}
+
+
+% \subsection{Curation interface}
+% \label{sucsec:supercon2-user-interface}
+% SuperCon\textsubscript{2} can be utilised as text file (CSV or TSV) for processing and to build ML models and data-driven applications. 
+
+% Although the automatic system might achieve good results and extract a large quantity of data, we are aware that some sort of ``user validation'' is required for improving the data quality. For this reason we have built SuperCon\textsubscript{2} with in mind the needs of an efficient curation interface. 
+We built a visualisation interface to exploit the extracted information.
+Users can search in the synthesised tabular data, access the PDF document enriched with the extracted information (Figure~\ref{fig:pdf-annotations}), and export locally in CSV, TSV and Microsoft Excel formats.
+
+\section{Conclusion}
+\label{sec:conclusion}
+In this work, we present our solution for automatically building a database of materials and properties from scientific literature.
+Our contribution is composed of: 1) Grobid-superconductors, a specialised open-source system that processes PDF documents combining ML and rule-based methods to extract and link relevant information in superconductors research; 2) a pipeline allowing large-scale document processing; and 3) a visualisation interface for rapid data exploration, which includes PDF document information enrichment.
+
+We made SuperCon\textsuperscript{2}, a database with 40324 records of superconductors materials and properties, including the applied pressure and the \tc~measurement method.
+SuperCon\textsubscript{2} is available in text format at \url{https://github.com/lfoppiano/supercon}.
+
+In the future, we plan to improve our tools by 1) extracting more properties, such as crystal structure type, space groups type, and lattice structure; 2) training supervised models for the ``Linking step''; and 3) extending the interface to support data correction toward efficient curation.
+We confirmed the good generalisation ability of the Scibert architecture for the entity extraction task.
+Although we hope to obtain better results using materials science pre-trained BERT, such as MatSciBERT~\cite{gupta_matscibert_2022}, the gain might be just minimal for relatively larger models~\cite{hong2022ScholarBERT}.
+
+\section*{Acknowledgement}
+\label{sec:acknowledgement}
+Our warmest thanks to Patrice Lopez, the author of Grobid~\cite{GROBID}, DeLFT~\citep{DeLFT}, and many other interesting open-source projects.
+
+%\section*{Notes on contributors}
+% for later 
+
+\section*{Data and code availability}
+Grobid-superconductors is available on Github at \url{https://github.com/lfoppiano/grobid-superconductors} and the code is released under license Apache 2.0. 
+SuperCon\textsubscript{2} is available in text format at \url{https://github.com/lfoppiano/supercon}. 
+
+
+\section*{Competing interests}
+The authors declare no competing interests.
+
+
+\bibliography{bibliography}
+\bibliographystyle{tfnlm}
+
+\section*{Figures \& Tables}
+
+\begin{figure}[ht]
+    \includegraphics[width=\textwidth]{schema-architecture-colors}
+    \caption{Processing pipeline for extracting superconductors materials and properties. }
+    \label{fig:pipeline-overview}
+\end{figure}
+
+
+\begin{table}[ht]
+    \centering
+    \tbl{Results from cross-validation for sentence-based and paragraphs-based text.  }
+    {
+        \begin{tabular}{lrrr}
+            \toprule
+            \textbf{Label}             & \textbf{Precision} & \textbf{Recall} & \textbf{F1} \\
+            \midrule
+            Paragraph-based micro avg. & 44.44              & 27.21           & 33.76       \\
+            Sentence-based micro avg.  & 48.41              & 50.00           & 51.70       \\
+            \bottomrule
+        \end{tabular}
+    }
+    \label{tab:comparison-evaluation-sentences-paragraphs}
+\end{table}
+
+\begin{figure}[ht]
+    \includegraphics[width=\textwidth]{document-structuring-colors}
+    \caption{Grobid-superconductors extraction processes (bibliographic information, superconductor entity extraction and sentence segmentation) within the Grobid cascade data flow.}
+    \label{fig:grobid-document-processing}
+\end{figure}
+
+\begin{figure}[ht]
+    \includegraphics[width=\textwidth]{schema-extraction-colors}
+    \caption{\label{fig:extraction-ml-models-cascade-architecture} Cascade architecture in the NER step. The white rectangles indicate the extracted information (described in Tables~\ref{tab:superconductors-parser-entities} and~\ref{tab:material-parser-entities}).}
+\end{figure}
+
+\begin{table}[ht]
+    \tbl{Entities extracted by the superconductors parser.}
+    {\begin{tabular}{m{19em} m{30em}}
+        \toprule
+        \textbf{Entity} (\textbf{tag})              & \textbf{Description} \\
+        \midrule
+        Material (\texttt{<material>})              & Materials and samples names, formulas (including stochiometric formulas), substitution variables of values and elements, shape, doping, and substrate               \\
+        Class (\texttt{<class>})                    & Groups of materials having similar characteristics or common strategic compounds that define their nature                                                      \\
+        \tc value (\texttt{<tcValue>})      & The value of the superconductor critical temperature                                                                                                          \\
+        \tc expressions (\texttt{<tc>})     & Expressions in the text that provide information about the phenomenon of superconductivity related to a value, interval or variation of the \tc \\
+        Measurement method (\texttt{<me\_method>}) & Technique used to measure or calculate the presence of superconductivity                                                                                     \\
+        Applied pressure (\texttt{<pressure>})      & Applied pressure when superconductivity is recorded                                                                                                            \\
+        \bottomrule
+    \end{tabular}}
+    \label{tab:superconductors-parser-entities}
+\end{table}
+
+\begin{table}[ht]
+    \tbl{Entities extracted by the material parser. }
+    {
+        \begin{tabular}{m{16em} m{30em}}
+            \toprule
+            \textbf{Entity} (\textbf{tag})               & \textbf{Description}                                                                                                              \\
+            \midrule
+            Name (\texttt{<name>})                       & The canonical name of a material (e.g., hydrogen, PCCO, carbon)                                                                    \\
+            Formula (\texttt{<formula>})                 & Chemical formula of the material (e.g., \texttt{Pr1.869Ce0.131CuO 4-}, \texttt{MgB2}, \texttt{La 2-x Sr x CuO 4})                  \\
+            Doping (\texttt{<doping>})                   & Doping ratio and doping materials that are adjoined to the material name (e.g., \texttt{Zn-doped}, \texttt{2\% Zn-doped})          \\
+            Shape (\texttt{<shape>})                     & shape of the material (e.g. single crystal, polycrystalline, thin film, powder, film)                                             \\
+            Substitution variables (\texttt{<variable>}) & Variables that can be substituted in the formula.                                                                                 \\
+            Substitution values (\texttt{<value>})       & Values expressed in the doping.                                                                                                   \\
+            Substrate (\texttt{<substrate>})             & Substrates as defined in the material name                                                                                        \\
+            Fabrication (\texttt{<fabrication>})         & Additional information that does not belong to any of the previous tags  (e.g., intercalated, electron-doped) \\
+            \bottomrule
+        \end{tabular}
+    }
+    \label{tab:material-parser-entities}
+\end{table}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{superconductor-holdout-training-set}
+    \caption{Holdout/training set distribution for (a) general metrics and (b) entity labels; entities and unique entities indicate the number of labelled entities with and without value duplicates, respectively, and positive examples (+) and negative examples (-) indicate the number of sentences with at least one entity and with no entities, respectively.}
+    \label{fig:training-holdout-set-distribution}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.6\textwidth]{superconductor-out-domain-holdout-unique}
+    \caption{Holdout ``out-of-domain'' rates. The entities from the holdout set that are also in the training set are ``in-domain'' and the entities that are not in the training set are ``out-of-domain''.}
+    \label{fig:out-domain-holdout}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{example-comparison-archs.png}
+    \caption{Examples taken from two sources~\cite{Gajda_2016, Shibata_2016} of results from three different architectures: CRF, BidLSTM\_CRF and, Scibert. The boxes annotating the text represent the extracted entities (material with light blue, \tc with green, and \tc expressions with yellow)}.
+    \label{fig:example-comparison-architectures}
+\end{figure}
+
+\begin{table}[ht]
+    % \centering\small
+    \tbl{Evaluation scores (\%) for the Superconductor ML model in the four architectures. For the DL architecture the results are averaged over 5 runs. Support (Supp) indicates the number of labels in the training data. Values in bold indicate the highest score. P: precision, R: recall.}
+    {
+    \scalebox{0.8}{
+        \begin{tabular}{l ccc ccc ccc ccc r}
+            \toprule
+            \textbf{Label}        & \multicolumn{3}{c}{\textbf{CRF}} & \multicolumn{3}{c}{\textbf{BidLSTM\_CRF}} & \multicolumn{3}{c}{\makecell{\textbf{BidLSTM\_CRF}                                                                                                                                                 \\\textbf{\_FEATURES}}} & \multicolumn{3}{c}{\textbf{Scibert}} & \textbf{Supp} \\
+            \cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-10}\cmidrule(lr){11-13}\cmidrule(lr){14-14}
+                                  & \textbf{P}                       & \textbf{R}                                & \textbf{F1}                                        & \textbf{P} & \textbf{R} & \textbf{F1}    & \textbf{P}     & \textbf{R} & \textbf{F1}    & \textbf{P} & \textbf{R}     & \textbf{F1}    &      \\
+            \midrule
+            \texttt{<class>}      & 79.74                            & 66.79                                     & 72.69                                              & 79.01      & 72.62      & \textbf{75.66} & 77.84          & 72.40      & 74.97          & 72.95      & 75.28          & 74.09          & 1646 \\
+            \texttt{<material>}   & 79                               & 72.15                                     & 75.42                                              & 79.25      & 76.94      & 78.06          & 81.07          & 75.10      & 77.94          & 80.15      & 81.42          & \textbf{80.77} & 6943 \\
+            \texttt{<me\_method>} & 60.25                            & 68.73                                     & 64.21                                              & 56.41      & 79.49      & 65.92          & 55.86          & 80.45      & 65.90          & 56.26      & 81.52          & \textbf{66.56} & 1883 \\
+            \texttt{<pressure>}   & 46.15                            & 29.27                                     & 35.82                                              & 49.45      & 58.05      & 52.53          & 50.25          & 60.49      & \textbf{54.36} & 41.72      & 52.68          & 46.51          & 274  \\
+            \texttt{<tc>}         & 84.36                            & 83.57                                     & \textbf{83.96}                                     & 78.61      & 82.54      & 80.48          & 79.19          & 82.07      & 80.60          & 74.46      & 82.66          & 78.35          & 3741 \\
+            \texttt{<tcValue>}    & 69.8                             & 66.24                                     & 67.97                                              & 70.36      & 75.16      & 72.67          & 68.95          & 76.56      & 72.52          & 70.90      & 79.74          & \textbf{75.06} & 1099 \\
+            \midrule
+            All (micro avg)       & 76.88                            & 72.77                                     & 74.77                                              & 74.59      & 77.67      & 76.09          & \textbf{75.17} & 76.79      & 75.96          & 73.69      & \textbf{80.69} & \textbf{77.03}        \\
+            \bottomrule
+        \end{tabular}
+    }
+    }
+    \label{tab:evaluation-superconductors-ML-model}
+\end{table}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{material-holdout-training-set}
+    \caption{Holdout/training set for the Material ML model: (a) general metrics and (b) entity labels.}
+    \label{fig:material-training-holdout-set-distribution}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.6\textwidth]{material-out-domain-holdout-unique}
+    \caption{Holdout ``out-of-domain'' rates for the Material ML model. The entities from the holdout set that are also in the training set are the in-domain, and the entities that are not in the training set are the out-of-domain}
+    \label{fig:material-out-domain-holdout}
+\end{figure}
+
+\begin{table}[ht]
+    \centering\small
+    \tbl{Evaluation scores (\%) of the Material ML model with holdout set. Support (Supp) indicates the number of labels in the training data. Values in bold indicate the highest score. P: precision, R: recall.}
+    {
+        \scalebox{0.8}{
+        \begin{tabular}{l ccc ccc ccc ccc r}
+            \toprule
+            \textbf{Label}         & \multicolumn{3}{c}{\textbf{CRF}} & \multicolumn{3}{c}{\textbf{BidLSTM\_CRF}} & \multicolumn{3}{c}{\makecell{\textbf{BidLSTM\_CRF}                                                                                                                                                 \\\textbf{\_FEATURES}}} & \multicolumn{3}{c}{\textbf{SciBERT}} & \textbf{Supp}  \\
+            \cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-10}\cmidrule(lr){11-13}\cmidrule(lr){14-14}
+                                   & \textbf{P}                       & \textbf{R}                                & \textbf{F1}                                        & \textbf{P} & \textbf{R} & \textbf{F1}    & \textbf{P}     & \textbf{R} & \textbf{F1}    & \textbf{P} & \textbf{R}     & \textbf{F1}    &      \\
+            \midrule
+            \texttt{<doping>}      & 60.41                            & 55.85                                     & 58.04                                              & 67.98      & 62.42      & 64.95          & 69.00          & 62.34      & \textbf{65.43} & 63.58      & 62.79          & 63.16          & 792  \\
+            \texttt{<fabrication>} & 40.00                            & 4.55                                      & 8.16                                               & 23.61      & 5.91       & 9.24           & 37.33          & 9.09       & 14.48          & 22.51      & 13.18          & \textbf{16.52} & 94   \\
+            \texttt{<formula>}     & 80.81                            & 82.29                                     & 81.54                                              & 82.59      & 84.14      & 83.35          & 83.83          & 85.14      & 84.47          & 84.53      & 86.56          & \textbf{85.53} & 6301 \\
+            \texttt{<name>}        & 72.2                             & 63.75                                     & 67.71                                              & 76.29      & 78.76      & 77.43          & 74.51          & 80.38      & 77.33          & 77.18      & 81.86          & \textbf{79.44} & 1930 \\
+            \texttt{<shape>}       & 90.89                            & 92.51                                     & 91.69                                              & 90.93      & 95.79      & \textbf{93.29} & 90.33          & 95.74      & 92.96          & 89.67      & 97.20          & 93.28          & 809  \\
+            \texttt{<substrate>}   & 37.04                            & 6.76                                      & 11.43                                              & 54.31      & 32.43      & 40.44          & 60.08          & 33.38      & 42.82          & 56.32      & 41.22          & \textbf{47.59} & 32   \\
+            \texttt{<value>}       & 80.21                            & 83.15                                     & 81.65                                              & 84.81      & 89.33      & 86.99          & 85.16          & 90.15      & \textbf{87.58} & 83.14      & 85.92          & 84.50          & 1895 \\
+            \texttt{<variable>}    & 96.85                            & 95.98                                     & 96.41                                              & 95.19      & 97.77      & 96.46          & 96.32          & 97.90      & \textbf{97.10} & 96.22      & 96.52          & 96.37          & 1795 \\
+            \midrule
+            All (micro avg)        & 81.15                            & 78.09                                     & 79.59                                              & 82.76      & 83.50      & 83.13          & \textbf{83.20} & 84.33      & 83.76          & 83.11      & \textbf{85.23} & \textbf{84.15} &      \\
+            \bottomrule
+        \end{tabular}
+    }
+    }
+    \label{tab:evaluation-10fold-material-parser}
+\end{table}
+
+\begin{table}[ht]
+    \centering
+    \tbl{Evaluation scores for the Linking. Support (Supp) indicates the number of labels in the training data. Values in bold indicate the highest score. P: precision, R: recall.}{
+        \begin{tabular}{lcccc}
+            \toprule
+            \textbf{Relationship type}          & \textbf{P} & \textbf{R} & \textbf{F1-} & Supp \\
+            \midrule
+            \textbf{material-tcValue}   & 88.40              & 74.52           & 80.87             & 726     \\
+            \textbf{tcValue-pressure}   & 85.71              & 71.52           & 77.98             & 118     \\
+            \textbf{me\_method-tcValue} & 62.28              & 65.74           & 63.96             & 151     \\
+            % \textbf{material-\tc} (CRF)    & 68.52 &	70.11   &  69.16  &  \\
+            % \textbf{\tc-pressure} (CRF)    & 72.92 &	67.67   &  69.76  &  \\
+            % \textbf{\tc-me.method} (CRF)   & 49.99 &	45.21   &  44.65  & \\
+            \bottomrule
+        \end{tabular}
+    }
+    \label{table:evaluation-linking}
+\end{table}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{error-types-colors}
+    \caption{\textit{Error types} in the context of the data flow. }
+    \label{fig:error-types}
+\end{figure}
+
+\begin{table}[ht]
+    \centering
+    \tbl{Summary of the E2EE evaluation scores. Support indicates the number of labels in the training data.}{
+        \begin{tabular}{l c c}
+            \toprule
+            \textbf{Subsection}                                      & \textbf{Precision} & \textbf{Support} \\
+            \midrule
+            Title                                                    & 100                & 2                \\
+            Abstract                                                 & 80.32              & 61               \\
+            Paragraph                                                & 75.2               & 623              \\
+            Figure captions                                          & 59.28              & 140              \\
+            Unknown                                                  & 57.14              & 21               \\
+            \midrule
+            \textbf{Micro avg.}                                      & 72.60              & 847              \\
+            \textbf{Micro avg.} (excl. figures)                      & 75.24              & 707              \\
+            \textbf{Micro avg.} (excl. unknown sections)             & 73.00              & 603              \\
+            \textbf{Micro avg.} (excl. figures and unknown sections) & 79.14              & 657              \\
+            \bottomrule
+        \end{tabular}
+    }
+    \label{table:end2end-evaluation-summary}
+\end{table}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\linewidth]{error-types-bars-perc}
+    \caption{Error type distribution in the E2EE of the \textit{500-papers} dataset.}
+    \label{fig:error-types-distribution}
+\end{figure}
 
 \afterpage {
     \clearpage % Flush earlier floats (otherwise order might not be correct)
@@ -700,65 +752,12 @@ The schema of SuperCon\textsuperscript{2} is summarised with examples in Table~\
 }
 
 
-The data is processed and ingested through the asynchronous Map-Reduce approach~\cite{10.1145/1327452.1327492}.
-The ``extraction task'' (Map) processes the PDF documents by accessing Grobid-superconductors via REST API and stores their processed representation together with the original PDF document.
-Furthermore, the ``aggregation task'' (Reduce) reduces the document information into a synthesised tabular format.
-We store the processed document representation in JSON format. 
-The processed documents are kept separately and used for displaying the enhanced PDF document (Figure~\ref{fig:pdf-annotations}).
-The pipeline uses a persistence layer for storage and reporting (logger)..
-
-% \begin{figure}[ht]
-% \centering
-% \includegraphics[width=0.7\textwidth]{workflow-schema-1}
-% \caption{Schema of the ingestion workflow}
-% \label{fig:ingestion-workflow}
-% \end{figure}
-
-
-% \subsection{Curation interface}
-% \label{sucsec:supercon2-user-interface}
-% SuperCon\textsubscript{2} can be utilised as text file (CSV or TSV) for processing and to build ML models and data-driven applications. 
-
-% Although the automatic system might achieve good results and extract a large quantity of data, we are aware that some sort of ``user validation'' is required for improving the data quality. For this reason we have built SuperCon\textsubscript{2} with in mind the needs of an efficient curation interface. 
-We built a visualisation interface to exploit the extracted information.
-Users can search in the synthesised tabular data, access the PDF document enriched with the extracted information (Figure~\ref{fig:pdf-annotations}), and export locally in CSV, TSV and Microsoft Excel formats.
-
-\section{Conclusion}
-\label{sec:conclusion}
-In this work, we present our solution for automatically building a database of materials and properties from scientific literature.
-Our contribution is composed of: 1) Grobid-superconductors, a specialised open-source system that processes PDF documents combining ML and rule-based methods to extract and link relevant information in superconductors research; 2) a pipeline allowing large-scale document processing; and 3) a visualisation interface for rapid data exploration, which includes PDF document information enrichment.
-
-We made SuperCon\textsuperscript{2}, a database with 40324 records of superconductors materials and properties, including the applied pressure and the \tc~measurement method.
-SuperCon\textsubscript{2} is available in text format at \url{https://github.com/lfoppiano/supercon}.
-
-In the future, we plan to improve our tools by 1) extracting more properties, such as crystal structure type, space groups type, and lattice structure; 2) training supervised models for the ``Linking step''; and 3) extending the interface to support data correction toward efficient curation.
-We confirmed the good generalisation ability of the Scibert architecture for the entity extraction task.
-Although we hope to obtain better results using materials science pre-trained BERT, such as MatSciBERT~\cite{gupta_matscibert_2022}, the gain might be just minimal for relatively larger models~\cite{hong2022ScholarBERT}.
-
-\section*{Acknowledgement}
-\label{sec:acknowledgement}
-Our warmest thanks to Patrice Lopez, the author of Grobid~\cite{GROBID}, DeLFT~\citep{DeLFT}, and many other interesting open-source projects.
-
-%\section*{Notes on contributors}
-% for later 
-
-\section*{Data and code availability}
-Grobid-superconductors is available on Github at \url{https://github.com/lfoppiano/grobid-superconductors} and the code is released under license Apache 2.0. 
-SuperCon\textsubscript{2} is available in text format at \url{https://github.com/lfoppiano/supercon}. 
-
-
-\section*{Competing interests}
-
-The authors declare no competing interests.
-
-
-\bibliography{bibliography}
-\bibliographystyle{tfnlm}
+\clearpage
 
 % \begin{appendices}
 \appendix
 
-\section{Dataset additional information}
+\section{Additional information}
 
 \begin{table}[ht]!
     \centering
@@ -837,8 +836,6 @@ The authors declare no competing interests.
 \end{table}
 
 
-\section{Machine learning support material}
-
 \begin{table}[ht]!
     \centering
     \tbl{Summary of the features used in the \textit{superconductors} and \textit{material} ML models. \textit{All} under Architecture indicate only BidLSTM\_CRF\_FEATURES and CRF.}{
@@ -872,7 +869,6 @@ The authors declare no competing interests.
 \end{table}
 
 % \end{appendices}
-
 
 
 \end{document}
