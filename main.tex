@@ -61,8 +61,8 @@
     \affil{\textsuperscript{a}Material Database Group, MaDIS, NIMS, Tsukuba, JP; \textsuperscript{b}Nano Frontier Superconducting Materials Group, MANA, NIMS, Tsukuba, JP; \textsuperscript{c}Data and Web Science Group, University of Mannheim, Mannheim, DE}
 }
 
-
 \maketitle
+
 
 \begin{abstract}
     The automatic extraction of materials and related properties from the scientific literature is gaining attention in data-driven materials science (Materials Informatics).
@@ -418,7 +418,7 @@ The ``extraction task'' (Map) processes the PDF documents by accessing Grobid-su
 Furthermore, the ``aggregation task'' (Reduce) reduces the document information into a synthesised tabular format.
 We store the processed document representation in JSON format. 
 The processed documents are kept separately and used for displaying the enhanced PDF document (Figure~\ref{fig:pdf-annotations}).
-The pipeline uses a persistence layer for storage and reporting (logger)..
+The pipeline uses a persistence layer for storage and reporting (logger).
 
 % \begin{figure}[ht]
 % \centering
@@ -558,7 +558,7 @@ The authors declare no competing interests.
 \begin{figure}[ht]
     \centering
     \includegraphics[width=\textwidth]{example-comparison-archs.png}
-    \caption{Examples taken from two sources~\cite{Gajda_2016, Shibata_2016} of results from three different architectures: CRF, BidLSTM\_CRF and, Scibert. The boxes annotating the text represent the extracted entities (material with light blue, \tc with green, and \tc expressions with yellow).}
+    \caption{Examples taken from two sources~\cite{Gajda_2016, Shibata_2016} of results from three different architectures: CRF, BidLSTM\_CRF and, Scibert. The boxes annotating the text represent the extracted entities (material are indicated in light blue, \tc in green, and \tc expressions in yellow).}
     \label{fig:example-comparison-architectures}
 \end{figure}
 
