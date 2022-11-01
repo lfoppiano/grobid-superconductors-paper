@@ -54,14 +54,14 @@
 
 \articletype{RESEARCH PAPER}% Specify the article type or omit as appropriate
 
-\title{Automatic Extraction of Materials and Properties from Superconductors Scientific Literature}
-\maketitle
+\title{Automatic extraction of materials and properties from superconductors scientific literature}
+
 \author{
     \name{Luca Foppiano\textsuperscript{a}\thanks{Corresponding authors: Luca Foppiano (luca@foppiano.org) and Masashi Ishii (ISHII.Masashi@nims.go.jp)}, Pedro Baptista de Castro\textsuperscript{b}, Pedro Ortiz Suarez\textsuperscript{c}, Kensei Terashima\textsuperscript{b}, Yoshihiko Takano\textsuperscript{b}, Masashi Ishii\textsuperscript{a}}
     \affil{\textsuperscript{a}Material Database Group, MaDIS, NIMS, Tsukuba, JP; \textsuperscript{b}Nano Frontier Superconducting Materials Group, MANA, NIMS, Tsukuba, JP; \textsuperscript{c}Data and Web Science Group, University of Mannheim, Mannheim, DE}
 }
 
-
+\maketitle
 
 
 \begin{abstract}
@@ -77,9 +77,9 @@
     materials informatics, superconductors, machine learning, nlp, tdm
 \end{keywords}
 
-\begin{quote}
-    \textbf{CLASSIFICATION}: Machine learning, Text mining, NLP
-\end{quote}
+% \begin{quote}
+%     \textbf{CLASSIFICATION}: Machine learning, Text mining, NLP
+% \end{quote}
 
 
 \section{Introduction}
@@ -442,7 +442,7 @@ In this work, we present our solution for automatically building a database of m
 Our contribution is composed of: 1) Grobid-superconductors, a specialised open-source system that processes PDF documents combining ML and rule-based methods to extract and link relevant information in superconductors research; 2) a pipeline allowing large-scale document processing; and 3) a visualisation interface for rapid data exploration, which includes PDF document information enrichment.
 
 We made SuperCon\textsuperscript{2}, a database with 40324 records of superconductors materials and properties, including the applied pressure and the \tc~measurement method.
-SuperCon\textsubscript{2} is available in text format at \url{https://github.com/lfoppiano/supercon}.
+SuperCon\textsuperscript{2} is available in text format at \url{https://github.com/lfoppiano/supercon}.
 
 In the future, we plan to improve our tools by 1) extracting more properties, such as crystal structure type, space groups type, and lattice structure; 2) training supervised models for the ``Linking step''; and 3) extending the interface to support data correction toward efficient curation.
 We confirmed the good generalisation ability of the Scibert architecture for the entity extraction task.
@@ -450,14 +450,15 @@ Although we hope to obtain better results using materials science pre-trained BE
 
 \section*{Acknowledgement}
 \label{sec:acknowledgement}
-Our warmest thanks to Patrice Lopez, the author of Grobid~\cite{GROBID}, DeLFT~\citep{DeLFT}, and many other interesting open-source projects.
+Our warmest thanks to Sae Dieb, who contributed with fruitful discussion on this project, and to Patrice Lopez, the author of Grobid~\cite{GROBID}, DeLFT~\citep{DeLFT}, and other several interesting TDM projects for his continuous support and help with ideas, suggestions, and discussions.
+
 
 %\section*{Notes on contributors}
 % for later 
 
 \section*{Data and code availability}
 Grobid-superconductors is available on Github at \url{https://github.com/lfoppiano/grobid-superconductors} and the code is released under license Apache 2.0. 
-SuperCon\textsubscript{2} is available in text format at \url{https://github.com/lfoppiano/supercon}. 
+SuperCon\textsuperscript{2} is available in text format at \url{https://github.com/lfoppiano/supercon}. 
 
 
 \section*{Competing interests}
