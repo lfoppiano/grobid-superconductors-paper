@@ -1,5 +1,6 @@
 # Automatic extraction of materials and properties from superconductors scientific literature
 
+(Main repository of the software)[https://github.com/lfoppiano/grobid-superconductors]
 
 To cite this article:
 
